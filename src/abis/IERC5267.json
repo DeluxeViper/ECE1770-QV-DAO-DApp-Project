@@ -60,7 +60,7 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "// SPDX-License-Identifier: MIT\n// OpenZeppelin Contracts (last updated v4.9.0) (interfaces/IERC5267.sol)\n\npragma solidity ^0.8.0;\n\ninterface IERC5267 {\n    /**\n     * @dev MAY be emitted to signal that the domain could have changed.\n     */\n    event EIP712DomainChanged();\n\n    /**\n     * @dev returns the fields and values that describe the domain separator used by this contract for EIP-712\n     * signature.\n     */\n    function eip712Domain()\n        external\n        view\n        returns (\n            bytes1 fields,\n            string memory name,\n            string memory version,\n            uint256 chainId,\n            address verifyingContract,\n            bytes32 salt,\n            uint256[] memory extensions\n        );\n}\n",
-  "sourcePath": "@openzeppelin\\contracts\\interfaces\\IERC5267.sol",
+  "sourcePath": "@openzeppelin/contracts/interfaces/IERC5267.sol",
   "ast": {
     "absolutePath": "@openzeppelin/contracts/interfaces/IERC5267.sol",
     "exportedSymbols": {
@@ -365,7 +365,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.16",
-  "updatedAt": "2024-04-13T05:11:59.932Z",
+  "updatedAt": "2024-04-13T21:45:52.250Z",
   "devdoc": {
     "events": {
       "EIP712DomainChanged()": {

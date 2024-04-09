@@ -328,7 +328,7 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "// SPDX-License-Identifier: MIT\n// OpenZeppelin Contracts (last updated v4.9.0) (interfaces/IERC4906.sol)\n\npragma solidity ^0.8.0;\n\nimport \"./IERC165.sol\";\nimport \"./IERC721.sol\";\n\n/// @title EIP-721 Metadata Update Extension\ninterface IERC4906 is IERC165, IERC721 {\n    /// @dev This event emits when the metadata of a token is changed.\n    /// So that the third-party platforms such as NFT market could\n    /// timely update the images and related attributes of the NFT.\n    event MetadataUpdate(uint256 _tokenId);\n\n    /// @dev This event emits when the metadata of a range of tokens is changed.\n    /// So that the third-party platforms such as NFT market could\n    /// timely update the images and related attributes of the NFTs.\n    event BatchMetadataUpdate(uint256 _fromTokenId, uint256 _toTokenId);\n}\n",
-  "sourcePath": "@openzeppelin\\contracts\\interfaces\\IERC4906.sol",
+  "sourcePath": "@openzeppelin/contracts/interfaces/IERC4906.sol",
   "ast": {
     "absolutePath": "@openzeppelin/contracts/interfaces/IERC4906.sol",
     "exportedSymbols": {
@@ -569,7 +569,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.16",
-  "updatedAt": "2024-04-13T05:11:59.930Z",
+  "updatedAt": "2024-04-13T21:45:52.249Z",
   "devdoc": {
     "events": {
       "BatchMetadataUpdate(uint256,uint256)": {

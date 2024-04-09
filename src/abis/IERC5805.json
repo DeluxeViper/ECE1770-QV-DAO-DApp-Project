@@ -219,7 +219,7 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "// SPDX-License-Identifier: MIT\n// OpenZeppelin Contracts (last updated v4.9.0) (interfaces/IERC5805.sol)\n\npragma solidity ^0.8.0;\n\nimport \"../governance/utils/IVotes.sol\";\nimport \"./IERC6372.sol\";\n\ninterface IERC5805 is IERC6372, IVotes {}\n",
-  "sourcePath": "@openzeppelin\\contracts\\interfaces\\IERC5805.sol",
+  "sourcePath": "@openzeppelin/contracts/interfaces/IERC5805.sol",
   "ast": {
     "absolutePath": "@openzeppelin/contracts/interfaces/IERC5805.sol",
     "exportedSymbols": {
@@ -327,7 +327,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.16",
-  "updatedAt": "2024-04-13T05:11:59.932Z",
+  "updatedAt": "2024-04-13T21:45:52.250Z",
   "devdoc": {
     "kind": "dev",
     "methods": {
