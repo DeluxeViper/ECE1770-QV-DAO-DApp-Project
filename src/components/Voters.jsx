@@ -7,7 +7,6 @@ import { listVoters } from '../Blockchain.services'
 
 const Voters = () => {
   const [voters, setVoters] = useState([])
-  const [data, setData] = useState([])
   const { id } = useParams()
 
   const timeAgo = (timestamp) => moment(Number(timestamp + '000')).fromNow()
@@ -29,15 +28,10 @@ const Voters = () => {
   useEffect(async () => {
     await listVoters(id).then((res) => {
       setVoters(res)
-      setData(res)
     })
   }, [id])
 
   const getAll = () => setVoters(data)
-
-  const getAccepted = () => setVoters(data.filter((vote) => vote.choosen))
-
-  const getRejected = () => setVoters(data.filter((vote) => !vote.choosen))
 
   return (
     <div className="flex flex-col p-8">
@@ -48,20 +42,6 @@ const Voters = () => {
           onClick={getAll}
         >
           All
-        </button>
-        <button
-          aria-current="page"
-          className={`px-6 py-2.5 ${deactive}`}
-          onClick={getAccepted}
-        >
-          Acceptees
-        </button>
-        <button
-          aria-current="page"
-          className={`rounded-r-full px-6 py-2.5 ${deactive}`}
-          onClick={getRejected}
-        >
-          Rejectees
         </button>
       </div>
       <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -86,7 +66,7 @@ const Voters = () => {
                     scope="col"
                     className="text-sm font-medium px-6 py-4 text-left"
                   >
-                    Vote
+                    Number of votes
                   </th>
                 </tr>
               </thead>
@@ -110,27 +90,7 @@ const Voters = () => {
                       {timeAgo(voter.timestamp)}
                     </td>
                     <td className="text-sm font-light px-6 py-4 whitespace-nowrap">
-                      {voter.choosen ? (
-                        <button
-                          className="border-2 rounded-full px-6 py-2.5 border-blue-600
-                          text-blue-600 font-medium text-xs leading-tight
-                          uppercase hover:border-blue-700 focus:border-blue-700
-                          focus:outline-none focus:ring-0 active:border-blue-800
-                          transition duration-150 ease-in-out"
-                        >
-                          Accepted
-                        </button>
-                      ) : (
-                        <button
-                          className="border-2 rounded-full px-6 py-2.5 border-red-600
-                          text-red-600 font-medium text-xs leading-tight
-                          uppercase hover:border-red-700 focus:border-red-700
-                          focus:outline-none focus:ring-0 active:border-red-800
-                          transition duration-150 ease-in-out"
-                        >
-                          Rejected
-                        </button>
-                      )}
+                      {voter.numVotes}
                     </td>
                   </tr>
                 ))}

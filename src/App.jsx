@@ -3,21 +3,27 @@ import { Routes, Route } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.min.css'
 import {
-  getInfo,
+  // getInfo,
   getProposals,
-  isWallectConnected,
+  isWalletConnected,
 } from './Blockchain.services'
 import Header from './components/Header'
 import Home from './views/Home'
 import Proposal from './views/Proposal'
+import { useGlobalState } from './store'
 
 const App = () => {
   const [loaded, setLoaded] = useState(false)
+  const [connectedAccount] = useGlobalState('connectedAccount');
+
   useEffect(async () => {
-    await isWallectConnected()
-     getInfo()
-     getProposals()
+    console.log("connectedAccount: " + connectedAccount);
+    await isWalletConnected()
+    // getInfo()
+    getProposals()
     setLoaded(true)
+    // console.log("isWalletConnected")
+    // console.log(await isWalletConnected())
   }, [])
 
   return (

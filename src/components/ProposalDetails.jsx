@@ -10,41 +10,26 @@ import {
   Legend,
   Tooltip,
 } from 'recharts'
-import { getProposal, voteOnProposal } from '../Blockchain.services'
-import { useGlobalState, daysRemaining } from '../store'
+import { daysRemaining } from '../store'
 
-const ProposalDetails = () => {
-  const { id } = useParams()
-  const [proposal, setProposal] = useState(null)
-  const [data, setData] = useState([])
-  const [isStakeholder] = useGlobalState('isStakeholder')
+const ProposalDetails = ({ proposal, data }) => {
 
-  useEffect(() => {
-    retrieveProposal()
-  }, [id])
+  const getColorForNumber = (number) => {
+    const colorMap = {
+        0: "#46b890", // Turquoise
+        1: "#ff0000",  // Red
+        2: "#00ff00",  // Green
+        3: "#0000ff",  // Blue
+        4: "#f0f0f0",  // White
+        5: "#0f0f0f",  
+        6: "#828333",  // yellow
+        7: "#4f119a",
+        // Define colors for numbers up to 100 as needed
+    };
 
-  const retrieveProposal = async () => {
-    await getProposal(id).then((res) => {
-      setProposal(res)
-      setData([
-        {
-          name: 'Voters',
-          Acceptees: res?.upvotes,
-          Rejectees: res?.downvotes,
-        },
-      ])
-    })
-  }
-
-  const onVote = async (choice) => {
-    if (new Date().getTime() > Number(proposal.duration + '000')) {
-      toast.warning('Proposal expired!')
-      return
-    }
-
-    await voteOnProposal(id, choice)
-    toast.success('Voted successfully!')
-  }
+    // Return color for the given number, defaulting to black for numbers not defined
+    return colorMap[number]|| "#000000"; // Default to black if color is not defined
+}
 
   return (
     <div className="p-8">
@@ -58,56 +43,16 @@ const ProposalDetails = () => {
       <hr className="my-6 border-gray-300" />
       <p>{proposal?.description}</p>
       <div className="flex flex-row justify-start items-center w-full mt-4 overflow-auto">
-        <BarChart width={730} height={250} data={data}>
+        <BarChart key={data} width={730} height={250} data={data}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis />
           <Tooltip />
           <Legend />
-          <Bar dataKey="Acceptees" fill="#2563eb" />
-          <Bar dataKey="Rejectees" fill="#dc2626" />
+          {data && data[0]?.candidateVotes?.map((candidateObjArr, i) => {
+            return <Bar dataKey={`candidateVotes[${i}][1]`} name={candidateObjArr[0]} fill={getColorForNumber(i)} />
+          })}
         </BarChart>
-      </div>
-      <div
-        className="flex flex-row justify-start items-center space-x-3 mt-4"
-        role="group"
-      >
-        {isStakeholder ? (
-          <>
-            <button
-              type="button"
-              className="inline-block px-6 py-2.5
-            bg-blue-600 text-white font-medium text-xs
-              leading-tight uppercase rounded-full shadow-md
-              hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700
-              focus:shadow-lg focus:outline-none focus:ring-0
-              active:bg-blue-800 active:shadow-lg transition
-              duration-150 ease-in-out dark:text-gray-300
-              dark:border dark:border-gray-500 dark:bg-transparent"
-              data-mdb-ripple="true"
-              data-mdb-ripple-color="light"
-              onClick={() => onVote(true)}
-            >
-              Accept
-            </button>
-            <button
-              type="button"
-              className="inline-block px-6 py-2.5
-            bg-blue-600 text-white font-medium text-xs
-              leading-tight uppercase rounded-full shadow-md
-              hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700
-              focus:shadow-lg focus:outline-none focus:ring-0
-              active:bg-blue-800 active:shadow-lg transition
-              duration-150 ease-in-out
-              dark:border dark:border-gray-500 dark:bg-transparent"
-              data-mdb-ripple="true"
-              data-mdb-ripple-color="light"
-              onClick={() => onVote(false)}
-            >
-              Reject
-            </button>
-          </>
-        ) : null}
       </div>
     </div>
   )

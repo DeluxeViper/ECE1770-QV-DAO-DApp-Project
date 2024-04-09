@@ -32,7 +32,6 @@ contract DominionDAO is ReentrancyGuard, AccessControl {
         address payable beneficiary;
         address proposer;
         address executor;
-        uint256 numCandidates;
     }
 
     struct VotedStruct {
@@ -63,8 +62,7 @@ contract DominionDAO is ReentrancyGuard, AccessControl {
         string calldata title,
         string calldata description,
         address beneficiary,
-        uint256 amount,
-        uint256 numCandidates
+        uint256 amount
     )external
      stakeholderOnly("Proposal Creation Allowed for Stakeholders only")
      returns (ProposalStruct memory)
@@ -79,7 +77,6 @@ contract DominionDAO is ReentrancyGuard, AccessControl {
         proposal.beneficiary = payable(beneficiary);
         proposal.amount = amount;
         proposal.duration = block.timestamp + MIN_VOTE_DURATION;
-        proposal.numCandidates = numCandidates;
 
         emit Action(
             msg.sender,

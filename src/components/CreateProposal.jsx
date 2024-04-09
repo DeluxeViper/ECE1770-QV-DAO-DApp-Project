@@ -7,15 +7,18 @@ import { toast } from 'react-toastify'
 const CreateProposal = () => {
   const [createModal] = useGlobalState('createModal')
   const [title, setTitle] = useState('')
-  const [amount, setAmount] = useState('')
-  const [beneficiary, setBeneficiary] = useState('')
   const [description, setDescription] = useState('')
-  const [numCandidates, setNumCandidates] = useState();
+  const [candidateNames, setCandidateNames] = useState()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!title || !description || !beneficiary || !amount) return
-    const proposal = { title, description, beneficiary, amount }
+    if (!title || !description) return
+
+    // Parse candidate names into list of str
+    const candidateNamesArr = candidateNames.split(",");
+    console.log("List of candidate split names: " + candidateNamesArr);
+
+    const proposal = { title, description, candidateNames }
 
     await raiseProposal(proposal)
     toast.success('Proposal created, reloading in progress...')
@@ -29,9 +32,8 @@ const CreateProposal = () => {
 
   const resetForm = () => {
     setTitle('')
-    setAmount('')
-    setBeneficiary('')
     setDescription('')
+    setCandidateNames('')
   }
 
   return (
@@ -73,39 +75,12 @@ const CreateProposal = () => {
               bg-transparent border-0
               focus:outline-none focus:ring-0"
               type="text"
-              name="amount"
-              placeholder="e.g 2.5 Eth"
-              onChange={(e) => setAmount(e.target.value)}
-              value={amount}
-              required
-            />
-          </div>
-
-          <div className="flex flex-row justify-between items-center border border-gray-500 dark:border-gray-500 rounded-xl mt-5">
-            <input
-              className="block w-full text-sm
-              bg-transparent border-0
-              focus:outline-none focus:ring-0"
-              type="text"
-              name="beneficiary"
-              placeholder="Beneficiary Address"
-              onChange={(e) => setBeneficiary(e.target.value)}
-              value={beneficiary}
-              required
-            />
-          </div>
-
-          <div className="flex flex-row justify-between items-center border border-gray-500 dark:border-gray-500 rounded-xl mt-5">
-
-            <input
-              className="block w-full text-sm
-              bg-transparent border-0
-              focus:outline-none focus:ring-0"
-              type="number"
-              name="number of candidates"
-              placeholder="Number of candidates"
-              onChange={(e) => setNumCandidates(e.target.value)}
-              value={numCandidates}
+              name="Candidate names"
+              placeholder="Candidate Names"
+              onChange={(e) =>
+                setCandidateNames(e.target.value)
+              }
+              value={candidateNames}
               required
             />
           </div>

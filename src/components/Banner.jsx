@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useGlobalState, setGlobalState } from '../store'
 import { toast } from 'react-toastify'
-import { performContribute } from '../Blockchain.services'
+// import { performContribute } from '../Blockchain.services'
 
 const Banner = () => {
   const [isStakeholder] = useGlobalState('isStakeholder')
@@ -11,13 +11,13 @@ const Banner = () => {
   const [amount, setAmount] = useState('')
 
   const onPropose = () => {
-    if (!isStakeholder) return
+    // if (!isStakeholder) return
     setGlobalState('createModal', 'scale-100')
   }
 
   const onContribute = async () => {
     if (!!!amount || amount == '') return
-    await performContribute(amount)
+    // await performContribute(amount)
     toast.success('Contribution received')
   }
 
@@ -40,11 +40,6 @@ const Banner = () => {
         </span>
       </p>
       <hr className="my-6 border-gray-300 dark:border-gray-500" />
-      <p>
-        {isStakeholder
-          ? 'You can now raise proposals on this platform 😆'
-          : 'Hey, when you contribute upto 1 ether you become a stakeholder 😎'}
-      </p>
       <div className="flex flex-row justify-start items-center md:w-1/3 w-full mt-4">
         <input
           type="number"
@@ -81,10 +76,9 @@ const Banner = () => {
           Contribute
         </button>
 
-        {isStakeholder ? (
-          <button
-            type="button"
-            className={`inline-block px-6 py-2.5
+        <button
+          type="button"
+          className={`inline-block px-6 py-2.5
             bg-blue-600 text-white font-medium text-xs
             leading-tight uppercase shadow-md rounded-full
             hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700
@@ -92,13 +86,13 @@ const Banner = () => {
             active:bg-blue-800 active:shadow-lg transition
             duration-150 ease-in-out dark:text-blue-500
             dark:border dark:border-blue-500 dark:bg-transparent`}
-            data-mdb-ripple="true"
-            data-mdb-ripple-color="light"
-            onClick={onPropose}
-          >
-            Propose
-          </button>
-        ) : null}
+          data-mdb-ripple="true"
+          data-mdb-ripple-color="light"
+          onClick={onPropose}
+        >
+          Propose
+        </button>
+
       </div>
     </div>
   )
