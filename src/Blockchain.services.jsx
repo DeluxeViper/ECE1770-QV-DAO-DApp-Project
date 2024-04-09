@@ -101,7 +101,7 @@ const getEtheriumContract = async () => {
 //   }
 // }
 
-const raiseProposal = async ({ title, description, candidateNames }) => {
+const raiseProposal = async ({ title, description, candidateNames, maxTokensPerAddress, qvEnabled, linearTimeDecayEnabled }) => {
   try {
     // amount = window.web3.utils.toWei(amount.toString(), 'ether')
     const contract = await getEtheriumContract()
@@ -109,10 +109,15 @@ const raiseProposal = async ({ title, description, candidateNames }) => {
 
     console.log("candidateNames");
     console.log(candidateNames);
+    console.log("maxtokensperaddress");
+    console.log(maxTokensPerAddress);
+    console.log("qvEnabled");
+    console.log(linearTimeDecayEnabled);
 
     const candidateNamesArr = candidateNames.split(",");
+    console.log(candidateNamesArr);
     await contract.methods
-      .createProposal(title, description, candidateNamesArr)
+      .createProposal(title, description, candidateNamesArr, maxTokensPerAddress, qvEnabled, linearTimeDecayEnabled)
       .send({ from: account })
 
     window.location.reload()
@@ -144,18 +149,15 @@ const structuredProposals = (proposals) => {
   return proposals
     .map((proposal) => ({
       id: proposal.id,
-      // amount: window.web3.utils.fromWei(proposal.amount),
       title: proposal.title,
       description: proposal.description,
-      // paid: proposal.paid,
-      // passed: proposal.passed,
       proposer: proposal.proposer,
-      // upvotes: Number(proposal.upvotes),
-      // downvotes: Number(proposal.downvotes),
-      // beneficiary: proposal.beneficiary,
-      // executor: proposal.executor,
       duration: proposal.duration,
-      candidates: proposal.candidates // TODO: Get CANDIDATES
+      candidates: proposal.candidates, // TODO: Get CANDIDATES
+      totalVotes: proposal.totalVotes,
+      maxTokensPerAddress: proposal.maxTokensPerAddress,
+      qvEnabled: proposal.qvEnabled,
+      linearTimeDecayEnabled: proposal.linearTimeDecayEnabled
     }))
     .reverse()
 }
@@ -179,13 +181,17 @@ const getProposal = async (id) => {
       proposer: proposal.proposer,
       duration: proposal.duration,
       candidates: proposal.candidates,
+      totalVotes: proposal.totalVotes,
+      maxTokensPerAddress: proposal.maxTokensPerAddress,
+      qvEnabled: proposal.qvEnabled,
+      linearTimeDecayEnabled: proposal.linearTimeDecayEnabled
     }
 
     // console.log("old proposals")
     // console.log(getGlobalState('proposals'))
     // console.log("new proposals")
     // console.log(newProposals)
-    
+
 
     setGlobalState('proposals', newProposals)
 
@@ -204,12 +210,32 @@ const voteOnProposal = async (proposalId, candidateId, numVotes) => {
     await contract.methods
       .voteForCandidate(proposalId, candidateId, numVotes)
       .send({ from: account })
+      .on('error', function(error, receipt) {
+        console.log("error");
+        console.log(error);
+      })
 
     window.location.reload()
   } catch (error) {
-    reportError(error)
+    // reportError(error)
+    return error;
   }
 }
+
+// const getTokensLeftForProposal = async (proposalId) => {
+//   try {
+//     const contract = await getEtheriumContract()
+//     const account = getGlobalState('connectedAccount')
+//     return await contract.methods
+//       .getTokensLeftForProposal(proposalId)
+//       .send({ from: account })
+//
+//
+//   } catch (error) {
+//     reportError(error)
+//     return error;
+//   }
+// }
 
 const listVoters = async (id) => {
   try {
@@ -245,5 +271,6 @@ export {
   getProposal,
   voteOnProposal,
   listVoters,
+  // getTokensLeftForProposal,
 }
 

@@ -1,5 +1,5 @@
 import Identicon from 'react-identicons'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { truncate, useGlobalState, daysRemaining } from '../store'
 // import { payoutBeneficiary } from "../Blockchain.services";
@@ -8,6 +8,7 @@ import { toast } from 'react-toastify'
 const Proposals = () => {
   const [data] = useGlobalState('proposals')
   const [proposals, setProposals] = useState(data)
+
 
   const deactive = `bg-transparent
   text-blue-600 font-medium text-xs leading-tight
@@ -23,8 +24,11 @@ const Proposals = () => {
   transition duration-150 ease-in-out overflow-hidden
   border border-blue-600`
 
-  const getAll = () => setProposals(data)
+  useEffect(() => {
+    getAll() 
+  }, [])
 
+  const getAll = () => setProposals(data)
   const getOpened = () =>
     setProposals(
       data.filter(
@@ -38,11 +42,6 @@ const Proposals = () => {
         (proposal) => new Date().getTime() > Number(proposal.duration + '000')
       )
     )
-
-  const handlePayout = async (id) => {
-    // await payoutBeneficiary(id)
-    toast.success("Beneficiary successfully Paid Out!");
-  }
 
   return (
     <div className="flex flex-col p-8">
@@ -140,43 +139,6 @@ const Proposals = () => {
                         View
                       </Link>
 
-                      {new Date().getTime() >
-                      Number(proposal.duration + '000') ? (
-                        proposal.upvotes > proposal.downvotes ? (
-                          !proposal.paid ? (
-                            <button
-                              className="dark:border rounded-full px-6 py-2.5 dark:border-red-600
-                                dark:text-red-600 dark:bg-transparent font-medium text-xs leading-tight
-                                uppercase hover:border-red-700 focus:border-red-700
-                                focus:outline-none focus:ring-0 active:border-red-800
-                                transition duration-150 ease-in-out text-white bg-red-600"
-                              onClick={() => handlePayout(proposal.id)}
-                            >
-                              Payout
-                            </button>
-                          ) : (
-                            <button
-                              className="dark:border rounded-full px-6 py-2.5 dark:border-green-600
-                                  dark:text-green-600 dark:bg-transparent font-medium text-xs leading-tight
-                                  uppercase hover:border-green-700 focus:border-green-700
-                                  focus:outline-none focus:ring-0 active:border-green-800
-                                  transition duration-150 ease-in-out text-white bg-green-600"
-                            >
-                              Paid
-                            </button>
-                          )
-                        ) : (
-                          <button
-                              className="dark:border rounded-full px-6 py-2.5 dark:border-red-600
-                                  dark:text-red-600 dark:bg-transparent font-medium text-xs leading-tight
-                                  uppercase hover:border-red-700 focus:border-red-700
-                                  focus:outline-none focus:ring-0 active:border-red-800
-                                  transition duration-150 ease-in-out text-white bg-red-600"
-                            >
-                              Rejected
-                            </button>
-                        )
-                      ) : null}
                     </td>
                   </tr>
                 ))}
