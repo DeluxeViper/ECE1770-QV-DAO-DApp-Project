@@ -7,15 +7,19 @@ import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/draft-ERC721Votes.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
-contract QuadraDAO is ERC721, ERC721URIStorage, AccessControl, EIP712, ERC721Votes {
+contract QuadraNFT is ERC721, ERC721URIStorage, AccessControl, EIP712, ERC721Votes {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     uint256 private _nextTokenId;
 
-    constructor(address admin)
-        ERC721("QuadraDAO", "QDAO")
-        EIP712("QuadraDAO", "1")
+    constructor()
+        ERC721("QuadraNFT", "QNFT")
+        EIP712("QuadraNFT", "1")
     {
-        _grantRole(ADMIN_ROLE, admin);
+        _grantRole(ADMIN_ROLE, msg.sender);
+    }
+    
+    function grantAdminRole(address account) public onlyRole(ADMIN_ROLE) {
+        _grantRole(ADMIN_ROLE, account);
     }
 
     function safeMint(address to, string memory uri) public onlyRole(ADMIN_ROLE) {

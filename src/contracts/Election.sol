@@ -3,11 +3,14 @@ pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "./QuadraNFT.sol";
 
 contract Election is ReentrancyGuard, AccessControl {
+    bytes32 public immutable ADMIN_ROLE = keccak256("ADMIN_ROLE");
     uint32 immutable MIN_VOTE_DURATION = 5 minutes;
     uint256 immutable MAX_TOKENS = 10;
     uint256 totalProposals;
+    QuadraNFT public token;
 
     struct Candidate {
         uint256 id;
@@ -34,11 +37,27 @@ contract Election is ReentrancyGuard, AccessControl {
         uint256 numVotes;
     }
 
+    //voter status for anonymous voting
+    enum VoterStatus {
+        INITIAL,
+        IN_PROGRESS,
+        VALID
+    }
+
+    struct Voter {
+        string username;
+        VoterStatus status;
+        uint256 weight;
+    }
+
     mapping(uint256 => Proposal) private raisedProposals;
     mapping(address => Vote) private votes; // Keep track of Vote per address
 
     // Keep track of tokens spent per address for each proposdal
     mapping(address => mapping(uint256 => uint256)) private tokensSpent;
+
+    // Keep track of all voters
+    mapping(address => Voter) private voters;
 
     // All vote objects for a proposal
     mapping(uint256 => Vote[]) private votedOn;
@@ -48,6 +67,60 @@ contract Election is ReentrancyGuard, AccessControl {
     // mapping(address => uint256) private stakeholders;
 
     event Action(address indexed initiator, string message);
+    constructor(QuadraNFT _token) {
+        token = _token;
+        _grantRole(ADMIN_ROLE, msg.sender);
+        addVoter(msg.sender, "Admin", 1, VoterStatus.VALID);
+    }
+
+    function addVoter(address account, string memory username, uint256 weight, VoterStatus status) private {
+        if (voters[account].status != VoterStatus.INITIAL) {
+            return;
+        }
+        voters[account] = Voter(username, status, weight);
+    }
+
+    function grantAdminRole(address account) public onlyRole(ADMIN_ROLE) {
+        _grantRole(ADMIN_ROLE, account);
+    }
+
+    function getVoter(address account) external view returns (Voter memory voter, bool isAdmin) {
+        voter = voters[account];
+        // add is is admin role, add a bool to reply
+        if (hasRole(ADMIN_ROLE, account)) {
+            isAdmin = true;
+        }else{
+            isAdmin = false;
+        }
+        return (voter, isAdmin);
+    }
+
+    function applyNFT() public {
+        require(
+            voters[msg.sender].status == VoterStatus.INITIAL,
+            "User already registered"
+        );
+        voters[msg.sender] = Voter("Anonymous", VoterStatus.IN_PROGRESS, 1);
+    }
+
+    function getNFTAddress() public view returns (address) {
+        return address(token);
+    }
+
+    function _isStakeholder(address _voter) public view returns (bool) {
+        // if the voter has a token in the Token contract
+        // cast the function BalanceOf to the token contract QUadraDAO with address _token
+        if(token.balanceOf(_voter) > 0) return true;
+        return false;
+    }
+
+    function quadraticVote(uint256 voted, uint256 new_votes) public pure returns (uint) {
+        uint256 tokens = 0;
+        for (uint i = 1; i <= new_votes; i++) {
+            tokens += (voted + i) * (voted + i);
+        }
+        return tokens;
+    }
 
     function createProposal(
         string calldata title,
@@ -117,8 +190,7 @@ contract Election is ReentrancyGuard, AccessControl {
         // Check if msg.sender has enough tokens
         // TODO: Implement quadratic voiting here
         uint256 totalNumTokensSpent = tokensSpent[msg.sender][proposalId] +
-            numVotes *
-            1;
+            numVotes *1;
         if (totalNumTokensSpent >= MAX_TOKENS) {
             revert("Insufficient tokens for address.");
         }
