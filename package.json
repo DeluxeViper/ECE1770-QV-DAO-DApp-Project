@@ -29,6 +29,7 @@
     "web3": "^1.7.1"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@openzeppelin/contracts": "^4.5.0",
     "@tailwindcss/forms": "0.4.0",
     "@truffle/hdwallet-provider": "^2.0.4",
