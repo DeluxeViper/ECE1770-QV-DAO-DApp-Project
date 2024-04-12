@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "start": "cross-env GENERATE_SOURCEMAP=false react-app-rewired start",
-    "build": "react-app-rewired build",
+    "build": "cross-env CI=false GENERATE_SOURCEMAP=false react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
@@ -29,6 +29,7 @@
     "web3": "^1.7.1"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@openzeppelin/contracts": "^4.5.0",
     "@tailwindcss/forms": "0.4.0",
     "@truffle/hdwallet-provider": "^2.0.4",
