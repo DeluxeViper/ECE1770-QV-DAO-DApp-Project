@@ -10,30 +10,22 @@ import Header from './components/Header'
 import Home from './views/Home'
 import Proposal from './views/Proposal'
 import { useGlobalState } from './store'
+import AppFooter from './views/Footer'
+import BeforeLoginPage from './views/BeforeLoginPage'
 
 const App = () => {
   const [loaded, setLoaded] = useState(false)
   const [connectedAccount] = useGlobalState('connectedAccount');
 
-  useEffect(async () => {
-    console.log("connectedAccount: " + connectedAccount);
-    await isWalletConnected()
-    // getInfo()
-    getProposals()
-    setLoaded(true)
-    // console.log("isWalletConnected")
-    // console.log(await isWalletConnected())
-  }, [])
-
   return (
     <div className="min-h-screen bg-white text-gray-900 dark:bg-[#212936] dark:text-gray-300">
       <Header />
-      {loaded ? (
+      {loaded && connectedAccount ? (
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/proposal/:id" element={<Proposal />} />
         </Routes>
-      ) : null}
+      ) : <BeforeLoginPage />}
 
       <ToastContainer
         position="top-center"
@@ -46,6 +38,7 @@ const App = () => {
         draggable
         pauseOnHover
       />
+      <AppFooter />
     </div>
   )
 }

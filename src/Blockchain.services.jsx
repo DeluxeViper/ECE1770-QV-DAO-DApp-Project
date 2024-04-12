@@ -38,6 +38,7 @@ const isWalletConnected = async () => {
     } else {
       alert('Please connect wallet.')
       console.log('No accounts found.')
+      return false
     }
   } catch (error) {
     reportError(error)

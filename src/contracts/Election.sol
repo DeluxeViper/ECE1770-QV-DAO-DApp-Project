@@ -3,11 +3,14 @@ pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "./QuadraNFT.sol";
 
 contract Election is ReentrancyGuard, AccessControl {
+    bytes32 public immutable ADMIN_ROLE = keccak256("ADMIN_ROLE");
     uint32 immutable MIN_VOTE_DURATION = 5 minutes;
     uint256 immutable MAX_TOKENS = 10;
     uint256 totalProposals;
+    QuadraNFT public token;
 
     struct Candidate {
         uint256 id;
@@ -24,12 +27,6 @@ contract Election is ReentrancyGuard, AccessControl {
         address proposer;
         address executor; // ??
         Candidate[] candidates;
-        uint256 totalVotes;
-        uint256 maxTokensPerAddress;
-        uint256 timeLength;
-        
-        bool linearTimeDecayEnabled;
-        bool qvEnabled;
     }
 
     // Vote object to keep track of votes in a proposal
@@ -40,11 +37,27 @@ contract Election is ReentrancyGuard, AccessControl {
         uint256 numVotes;
     }
 
+    //voter status for anonymous voting
+    enum VoterStatus {
+        INITIAL,
+        IN_PROGRESS,
+        VALID
+    }
+
+    struct Voter {
+        string username;
+        VoterStatus status;
+        uint256 weight;
+    }
+
     mapping(uint256 => Proposal) private raisedProposals;
     mapping(address => Vote) private votes; // Keep track of Vote per address
 
-    // Keep track of tokens spent per address for each proposal
+    // Keep track of tokens spent per address for each proposdal
     mapping(address => mapping(uint256 => uint256)) private tokensSpent;
+
+    // Keep track of all voters
+    mapping(address => Voter) private voters;
 
     // All vote objects for a proposal
     mapping(uint256 => Vote[]) private votedOn;
@@ -54,15 +67,65 @@ contract Election is ReentrancyGuard, AccessControl {
     // mapping(address => uint256) private stakeholders;
 
     event Action(address indexed initiator, string message);
+    constructor(QuadraNFT _token) {
+        token = _token;
+        _grantRole(ADMIN_ROLE, msg.sender);
+        addVoter(msg.sender, "Admin", 1, VoterStatus.VALID);
+    }
+
+    function addVoter(address account, string memory username, uint256 weight, VoterStatus status) private {
+        if (voters[account].status != VoterStatus.INITIAL) {
+            return;
+        }
+        voters[account] = Voter(username, status, weight);
+    }
+
+    function grantAdminRole(address account) public onlyRole(ADMIN_ROLE) {
+        _grantRole(ADMIN_ROLE, account);
+    }
+
+    function getVoter(address account) external view returns (Voter memory voter, bool isAdmin) {
+        voter = voters[account];
+        // add is is admin role, add a bool to reply
+        if (hasRole(ADMIN_ROLE, account)) {
+            isAdmin = true;
+        }else{
+            isAdmin = false;
+        }
+        return (voter, isAdmin);
+    }
+
+    function applyNFT() public {
+        require(
+            voters[msg.sender].status == VoterStatus.INITIAL,
+            "User already registered"
+        );
+        voters[msg.sender] = Voter("Anonymous", VoterStatus.IN_PROGRESS, 1);
+    }
+
+    function getNFTAddress() public view returns (address) {
+        return address(token);
+    }
+
+    function _isStakeholder(address _voter) public view returns (bool) {
+        // if the voter has a token in the Token contract
+        // cast the function BalanceOf to the token contract QUadraDAO with address _token
+        if(token.balanceOf(_voter) > 0) return true;
+        return false;
+    }
+
+    function quadraticVote(uint256 voted, uint256 new_votes) public pure returns (uint) {
+        uint256 tokens = 0;
+        for (uint i = 1; i <= new_votes; i++) {
+            tokens += (voted + i) * (voted + i);
+        }
+        return tokens;
+    }
 
     function createProposal(
         string calldata title,
         string calldata description,
-        string[] memory _candidateNames,
-        uint256 maxTokensPerAddress,
-        bool qvEnabled,
-        bool linearTimeDecayEnabled,
-        uint32 timeLength 
+        string[] memory _candidateNames
     ) external returns (Proposal memory) {
         uint256 proposalId = totalProposals++;
         Proposal storage proposal = raisedProposals[proposalId];
@@ -70,13 +133,9 @@ contract Election is ReentrancyGuard, AccessControl {
         proposal.title = title;
         proposal.description = description;
         proposal.proposer = payable(msg.sender);
-        proposal.totalVotes = 0;
-        proposal.maxTokensPerAddress = maxTokensPerAddress;
-        proposal.qvEnabled = qvEnabled;
-        proposal.linearTimeDecayEnabled = linearTimeDecayEnabled; 
+
         // TODO: Make this variable
-        proposal.duration = block.timestamp + timeLength;
-        proposal.timeLength = timeLength;
+        proposal.duration = block.timestamp + MIN_VOTE_DURATION;
 
         // Init candidates
         for (uint256 i = 0; i < _candidateNames.length; i++) {
@@ -112,20 +171,13 @@ contract Election is ReentrancyGuard, AccessControl {
     function getTokensLeftForProposal(
         uint256 proposalId
     ) public view returns (uint256) {
-        Proposal storage proposal = raisedProposals[proposalId];
-
-        return
-            proposal.maxTokensPerAddress - tokensSpent[msg.sender][proposalId];
-    }
-
-    function getTokensSpent(uint256 proposalId) public view returns (uint256) {
-        return tokensSpent[msg.sender][proposalId];
+        return MAX_TOKENS - tokensSpent[msg.sender][proposalId];
     }
 
     function voteForCandidate(
         uint256 proposalId,
         uint256 candidateId,
-        uint256 numTokens 
+        uint256 numVotes
     ) public returns (Candidate memory) {
         Proposal storage proposal = raisedProposals[proposalId];
         Candidate[] memory candidates = proposal.candidates;
@@ -138,60 +190,26 @@ contract Election is ReentrancyGuard, AccessControl {
         // Check if msg.sender has enough tokens
         // TODO: Implement quadratic voiting here
         uint256 totalNumTokensSpent = tokensSpent[msg.sender][proposalId] +
-            numTokens;
-        require(
-            totalNumTokensSpent <= proposal.maxTokensPerAddress,
-            "Insufficient tokens for address."
-        );
+            numVotes *1;
+        if (totalNumTokensSpent >= MAX_TOKENS) {
+            revert("Insufficient tokens for address.");
+        }
 
         // Add vote to candidate
-        tokensSpent[msg.sender][proposalId] = totalNumTokensSpent;
-
-        // Quadratic voting: cost to the voter = (number of votes)^2
-        uint256 voteWeight = numTokens;
-        if (raisedProposals[proposalId].qvEnabled) {
-          voteWeight = sqrt(numTokens);
-        }
-        uint256 decayWeight = voteWeight;
-        if (raisedProposals[proposalId].linearTimeDecayEnabled) {
-          decayWeight = linearTimeDecay(decayWeight, proposalId);
-        }
-        proposal.candidates[candidateId].votes += decayWeight;
-        proposal.totalVotes += decayWeight;
+        proposal.candidates[candidateId].votes += numVotes; // TODO: Implement time decay here
 
         // proposal.candidates = candidates; // Updated candidates
 
         // Add vote to Address -> Vote map
         // votes[msg.sender] = Vote(msg.sender, proposalId, candidateId, block.timestamp);
         votedOn[proposalId].push(
-            Vote(msg.sender, candidateId, block.timestamp, decayWeight)
+            Vote(msg.sender, candidateId, block.timestamp, numVotes)
         );
 
         emit Action(msg.sender, "PROPOSAL_VOTE");
 
         // TODO: Should candidate be returned here or vote?
         return candidates[candidateId];
-    }
-
-    function linearTimeDecay(uint256 voteWeight, uint256 proposalId) internal view returns (uint256) {
-      uint256 endTime = raisedProposals[proposalId].duration;
-      if (block.timestamp >= endTime) {
-        return 0; // No voting power left
-      }
-      uint256 remainingDuration = endTime - block.timestamp;
-      // remainingDuration = 100 seconds, voteWeight = 3, endTime = 173432421;
-      uint256 decayedVote = (remainingDuration * voteWeight) / raisedProposals[proposalId].timeLength; 
-
-      return decayedVote;
-    }
-
-    function sqrt(uint256 x) internal pure returns (uint256 y) {
-      uint256 z = (x + 1) / 2;
-      y = x;
-      while (z < y) {
-        y = z;
-        z = (x / z + z) / 2;
-      }
     }
 
     function getVotesOfProposal(
