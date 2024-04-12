@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import { MdLightMode } from 'react-icons/md'
-import { FaMoon } from 'react-icons/fa'
-import { SiHiveBlockchain } from "react-icons/si";
+import { FaUserSecret, FaMoon } from 'react-icons/fa'
 import { useEffect, useState } from 'react'
 import { truncate, useGlobalState } from '../store'
 import { connectWallet } from '../Blockchain.services'
@@ -39,9 +38,9 @@ const Header = () => {
               to={'/'}
               className="flex flex-row justify-start items-center space-x-3"
             >
-              <SiHiveBlockchain className="cursor-pointer" size={25} />
+              <FaUserSecret className="cursor-pointer" size={25} />
               <span className="invisible md:visible dark:text-gray-300">
-                Quadratic Voting DAO DApp 
+                Dominion
               </span>
             </Link>
 

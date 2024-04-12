@@ -3,20 +3,15 @@ import { useParams } from 'react-router-dom'
 import ProposalDetails from '../components/ProposalDetails'
 import CandidatesList from '../components/CandidatesList';
 import Voters from '../components/Voters'
-import { getProposal, listVoters } from '../Blockchain.services'
+import { getProposal } from '../Blockchain.services'
 
 const Proposal = () => {
   const { id } = useParams()
   const [proposal, setProposal] = useState(null);
   const [data, setData] = useState([])
-  const [voters, setVoters] = useState([])
-
   
-  useEffect(async () => {
-    await retrieveProposal()
-    await listVoters(id).then((res) => {
-      setVoters(res)
-    })
+  useEffect(() => {
+    retrieveProposal()
   }, [id])
 
   useEffect(() => {
@@ -38,7 +33,7 @@ const Proposal = () => {
         const candidateVotes = res.candidates.map((candidate) => 
           [candidate.name, candidate.votes]
         )
-        setData([{ candidateVotes, voters }])
+        setData([{candidateVotes}])
 
       }
     })
@@ -46,9 +41,9 @@ const Proposal = () => {
 
   return (
     <>
-      <ProposalDetails proposal={proposal} data={data} voters={voters} />
+      <ProposalDetails proposal={proposal} data={data} />
       <CandidatesList proposal={proposal} />
-      <Voters voters={voters} />
+      <Voters />
     </>
   )
 }

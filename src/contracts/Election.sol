@@ -190,7 +190,8 @@ contract Election is ReentrancyGuard, AccessControl {
         // Check if msg.sender has enough tokens
         // TODO: Implement quadratic voiting here
         uint256 totalNumTokensSpent = tokensSpent[msg.sender][proposalId] +
-            numVotes *1;
+            numVotes *
+            1;
         if (totalNumTokensSpent >= MAX_TOKENS) {
             revert("Insufficient tokens for address.");
         }

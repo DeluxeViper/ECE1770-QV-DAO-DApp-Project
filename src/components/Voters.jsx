@@ -11,6 +11,13 @@ const Voters = () => {
 
   const timeAgo = (timestamp) => moment(Number(timestamp + '000')).fromNow()
 
+  const deactive = `bg-transparent
+  text-blue-600 font-medium text-xs leading-tight
+  uppercase hover:bg-blue-700 focus:bg-blue-700
+  focus:outline-none focus:ring-0 active:bg-blue-600
+  transition duration-150 ease-in-out overflow-hidden
+  border border-blue-600 hover:text-white focus:text-white`
+
   const active = `bg-blue-600
   text-white font-medium text-xs leading-tight
   uppercase hover:bg-blue-700 focus:bg-blue-700
@@ -28,6 +35,15 @@ const Voters = () => {
 
   return (
     <div className="flex flex-col p-8">
+      <div className="flex flex-row justify-center items-center" role="group">
+        <button
+          aria-current="page"
+          className={`rounded-l-full px-6 py-2.5 ${active}`}
+          onClick={getAll}
+        >
+          All
+        </button>
+      </div>
       <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div className="py-2 inline-block min-w-full sm:px-6 lg:px-8">
           <div className="h-[calc(100vh_-_20rem)] overflow-y-auto  shadow-md rounded-md">
