@@ -224,21 +224,21 @@
     "absolutePath": "@openzeppelin/contracts/interfaces/IERC5805.sol",
     "exportedSymbols": {
       "IERC5805": [
-        1841
+        1076
       ],
       "IERC6372": [
-        1856
+        1091
       ],
       "IVotes": [
-        1231
+        466
       ]
     },
-    "id": 1842,
+    "id": 1077,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1834,
+        "id": 1069,
         "literals": [
           "solidity",
           "^",
@@ -246,29 +246,29 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "107:23:9"
+        "src": "107:23:7"
       },
       {
         "absolutePath": "@openzeppelin/contracts/governance/utils/IVotes.sol",
         "file": "../governance/utils/IVotes.sol",
-        "id": 1835,
+        "id": 1070,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 1842,
-        "sourceUnit": 1232,
-        "src": "132:40:9",
+        "scope": 1077,
+        "sourceUnit": 467,
+        "src": "132:40:7",
         "symbolAliases": [],
         "unitAlias": ""
       },
       {
         "absolutePath": "@openzeppelin/contracts/interfaces/IERC6372.sol",
         "file": "./IERC6372.sol",
-        "id": 1836,
+        "id": 1071,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 1842,
-        "sourceUnit": 1857,
-        "src": "173:24:9",
+        "scope": 1077,
+        "sourceUnit": 1092,
+        "src": "173:24:7",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -277,49 +277,49 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 1837,
+              "id": 1072,
               "name": "IERC6372",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 1856,
-              "src": "221:8:9"
+              "referencedDeclaration": 1091,
+              "src": "221:8:7"
             },
-            "id": 1838,
+            "id": 1073,
             "nodeType": "InheritanceSpecifier",
-            "src": "221:8:9"
+            "src": "221:8:7"
           },
           {
             "baseName": {
-              "id": 1839,
+              "id": 1074,
               "name": "IVotes",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 1231,
-              "src": "231:6:9"
+              "referencedDeclaration": 466,
+              "src": "231:6:7"
             },
-            "id": 1840,
+            "id": 1075,
             "nodeType": "InheritanceSpecifier",
-            "src": "231:6:9"
+            "src": "231:6:7"
           }
         ],
         "canonicalName": "IERC5805",
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 1841,
+        "id": 1076,
         "linearizedBaseContracts": [
-          1841,
-          1231,
-          1856
+          1076,
+          466,
+          1091
         ],
         "name": "IERC5805",
-        "nameLocation": "209:8:9",
+        "nameLocation": "209:8:7",
         "nodeType": "ContractDefinition",
         "nodes": [],
-        "scope": 1842,
-        "src": "199:41:9",
+        "scope": 1077,
+        "src": "199:41:7",
         "usedErrors": []
       }
     ],
-    "src": "107:134:9"
+    "src": "107:134:7"
   },
   "compiler": {
     "name": "solc",
@@ -327,7 +327,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.16",
-  "updatedAt": "2024-04-13T02:18:13.521Z",
+  "updatedAt": "2024-04-13T05:11:59.932Z",
   "devdoc": {
     "kind": "dev",
     "methods": {

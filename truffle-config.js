@@ -17,9 +17,8 @@ module.exports = {
           PRIVATE_KEY, "https://sepolia.infura.io/v3/4eda45fd36c44830b01bf165cd4c00e5");
       },
         network_id: "11155111",
-        confirmations: 1,
-        timeoutBlocks: 200,
-        skipDryRun: true
+        timeoutBlocks: 400,
+        skipDryRun: true,
     },
   },
   contracts_directory: './src/contracts/',

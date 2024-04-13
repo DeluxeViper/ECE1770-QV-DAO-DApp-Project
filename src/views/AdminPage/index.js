@@ -1,63 +1,87 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Typography, Box, Button, List, ListItem, ListItemText } from '@mui/material';
-import { ethers } from 'ethers';
-import QuadraDAOABI from '../../contracts/QuadraDAO.json';
+import { useGlobalState } from '../../store';
 import "../../styles.css";
-import useEth from "../../contexts/EthContext/useEth";
+import { getAllUsers, mintNFT, grantAdminRole } from '../../Blockchain.services';
 
 function AdminPage() {
   // States to store different categories of users
   const [allUsers, setAllUsers] = useState([]);
   const [whitelistedUsers, setWhitelistedUsers] = useState([]);
   const [anonymousVoters, setAnonymousVoters] = useState([]);
-  const { state:{contract, nft_contract_address,accounts} } = useEth();
+  const [user] = useGlobalState('user');
+  const [contract] = useGlobalState('contract');
+  const [loading, setLoading] = useState(false);
 
   // Deploying 'QuadraDAO' contract address after running truffle migrate --reset
 
   // Fetch users from localStorage on component mount
   useEffect(() => {
-    const users = JSON.parse(localStorage.getItem('users') || '{}');
-    const whitelisted = JSON.parse(localStorage.getItem('whitelistedUsers') || '[]');
-    const anonymous = JSON.parse(localStorage.getItem('anonymousVoters') || '[]');
-
-    
-    setAllUsers(Object.keys(users));
-    setWhitelistedUsers(whitelisted);
-    setAnonymousVoters(anonymous);
-  }, []);
+    console.log(contract);
+    getAllUsers().then((users) => {
+      console.log("Users:", users);
+      setAllUsers(users);
+      // filter userslist to get whitelisted users
+      // filter anonymous voters (who applied for NFT)
+      const anomyous = users.filter(user => {
+        console.log(user);
+        return user.voter.status == 1;
+      });
+      setAnonymousVoters(anomyous);
+    }).catch((error) => {
+      console.error("Error fetching users:", error);
+    });
+  }, [contract]);
 
   // Handler for generating NFT
 
-  // const handleGenerateNFTs = async () => {
-  //   try {
-  //       const provider = new ethers.providers.Web3Provider(window.ethereum);
-  //       const signer = provider.getSigner();
-  //       const account = await signer.getAddress();
-  //       console.log("Account:", account);
-  //   } catch (error) {
-  //       console.error("Error:", error);
-  //   }
-  // };
+  const handleGenerateNFTs = async (user) => {
+    setLoading(true);
+    console.log(`Generate NFT for ${user}`);
+    // Add integration logic her
+    mintNFT(user.voterAddress).then(() => {
+      toast.success('NFT generated successfully');
+    }).catch((error) => {
+      console.error("Error generating NFT:", error);
+      toast.error('Error generating NFT');
+    }).finally(() => {
+      setLoading(false);
+    });
+  };
+
+  const grantAdmin = async (user) => {
+    setLoading(true);
+    console.log(`Grant Admin Role to ${user}`);
+    grantAdminRole(user.voterAddress).then(() => {
+      toast.success('Admin role granted successfully');
+    }).catch((error) => {
+      console.error("Error granting Admin role:", error);
+      toast.error('Error granting Admin role');
+    }).finally(() => {
+      setLoading(false);
+    });
+    // Add integration logic here
+  }
 
   //add user account [ accounts[1]]
-  const handleGenerateNFTs = async (userAddress = accounts[1]) => {
-    const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545");
-    //await provider.send("eth_requestAccounts", []);
-    const signer = provider.getSigner();
-    console.log(window.ethereum);
-    const account = await signer.getAddress();
-    console.log("Account:", account);
-    const checkedAddress = ethers.utils.getAddress(userAddress);
-    const contract = new ethers.Contract(nft_contract_address, QuadraDAOABI.abi, signer);
+//   const handleGenerateNFTs = async (userAddress = accounts[1]) => {
+//     const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545");
+//     //await provider.send("eth_requestAccounts", []);
+//     const signer = provider.getSigner();
+//     console.log(window.ethereum);
+//     const account = await signer.getAddress();
+//     console.log("Account:", account);
+//     const checkedAddress = ethers.utils.getAddress(userAddress);
+//     const contract = new ethers.Contract(nft_contract_address, QuadraDAOABI.abi, signer);
 
-    try {
-        const transaction = await contract.safeMint(checkedAddress, 'https://ipfs.io/ipfs/QmS6pfArdSefpB9F3uemwvrACdexTiQuQ1iAonMhmyBw66');
-        await transaction.wait();
-        console.log(`NFT generated for ${userAddress}`);
-    } catch (error) {
-        console.error(`Error generating NFT for ${userAddress}:`, error);
-    }
-};
+//     try {
+//         const transaction = await contract.safeMint(checkedAddress, 'https://ipfs.io/ipfs/QmS6pfArdSefpB9F3uemwvrACdexTiQuQ1iAonMhmyBw66');
+//         await transaction.wait();
+//         console.log(`NFT generated for ${userAddress}`);
+//     } catch (error) {
+//         console.error(`Error generating NFT for ${userAddress}:`, error);
+//     }
+// };
 
 
   // Handler for whitelisting user
@@ -76,14 +100,32 @@ function AdminPage() {
         <List>
           {allUsers.map((user) => (
             <ListItem key={user}>
-              <ListItemText primary={user} sx={{ '.MuiTypography-root': { fontSize: '1.3rem' } }} />
+              <ListItemText primary={user.username} sx={{ '.MuiTypography-root': { fontSize: '1.3rem' } }} />
+              <ListItemText
+                primary={user.status == 2 ? 'StakeHolder' : user.status == 1 ? 'In Progress' : 'Contributor'}
+                sx={{ '.MuiTypography-root': { fontSize: '1.3rem' } }}
+                secondary={'contributed: ' + window.web3.utils.fromWei(user.depositedAmount)+ ' Eth'}
+              />
               {whitelistedUsers.includes(user) && (
-                <Button onClick={() => handleWhitelistUser(user)} sx={{ backgroundColor: '#0F52BA', color: 'white', '&:hover': { backgroundColor: 'darkgray' }, }}>Whitelist User</Button>
+                <Button
+                  onClick={() => handleWhitelistUser(user)}
+                  sx={{ backgroundColor: '#0F52BA', color: 'white', '&:hover': { backgroundColor: 'darkgray' }, }}
+                  disabled={loading}
+                >Whitelist User</Button>
               )}
               {anonymousVoters.includes(user) && (
                 //add user account [ accounts[1]]
-                <Button onClick={() => handleGenerateNFTs("0x2774350730dfD2CD8bf822260ADAc827D3435515")} sx={{ backgroundColor: '#228B22', color: 'white', '&:hover': { backgroundColor: 'darkgray' }, }}>Generate NFT</Button>
+                <Button
+                  onClick={() => handleGenerateNFTs(user)}
+                  sx={{ backgroundColor: '#228B22', color: 'white', '&:hover': { backgroundColor: 'darkgray' }, }}
+                  disabled={loading}
+                >Generate NFT</Button>
               )}
+              {
+                !user.isAdmin && (
+                  <Button disabled={loading} onClick={() => grantAdmin(user)} sx={{ backgroundColor: '#228B22', color: 'white', '&:hover': { backgroundColor: 'darkgray' }, }}>Set Admin</Button>
+                )
+              }
             </ListItem>
           ))}
         </List>

@@ -42,15 +42,15 @@
     "absolutePath": "@openzeppelin/contracts/interfaces/IERC6372.sol",
     "exportedSymbols": {
       "IERC6372": [
-        1856
+        1091
       ]
     },
-    "id": 1857,
+    "id": 1092,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1843,
+        "id": 1078,
         "literals": [
           "solidity",
           "^",
@@ -58,7 +58,7 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "107:23:10"
+        "src": "107:23:8"
       },
       {
         "abstract": false,
@@ -67,48 +67,48 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 1856,
+        "id": 1091,
         "linearizedBaseContracts": [
-          1856
+          1091
         ],
         "name": "IERC6372",
-        "nameLocation": "142:8:10",
+        "nameLocation": "142:8:8",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "documentation": {
-              "id": 1844,
+              "id": 1079,
               "nodeType": "StructuredDocumentation",
-              "src": "157:133:10",
+              "src": "157:133:8",
               "text": " @dev Clock used for flagging checkpoints. Can be overridden to implement timestamp based checkpoints (and voting)."
             },
             "functionSelector": "91ddadf4",
-            "id": 1849,
+            "id": 1084,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "clock",
-            "nameLocation": "304:5:10",
+            "nameLocation": "304:5:8",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1845,
+              "id": 1080,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "309:2:10"
+              "src": "309:2:8"
             },
             "returnParameters": {
-              "id": 1848,
+              "id": 1083,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1847,
+                  "id": 1082,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1849,
-                  "src": "335:6:10",
+                  "scope": 1084,
+                  "src": "335:6:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -116,10 +116,10 @@
                     "typeString": "uint48"
                   },
                   "typeName": {
-                    "id": 1846,
+                    "id": 1081,
                     "name": "uint48",
                     "nodeType": "ElementaryTypeName",
-                    "src": "335:6:10",
+                    "src": "335:6:8",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint48",
                       "typeString": "uint48"
@@ -128,48 +128,48 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "334:8:10"
+              "src": "334:8:8"
             },
-            "scope": 1856,
-            "src": "295:48:10",
+            "scope": 1091,
+            "src": "295:48:8",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
             "documentation": {
-              "id": 1850,
+              "id": 1085,
               "nodeType": "StructuredDocumentation",
-              "src": "349:48:10",
+              "src": "349:48:8",
               "text": " @dev Description of the clock"
             },
             "functionSelector": "4bf5d7e9",
-            "id": 1855,
+            "id": 1090,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "CLOCK_MODE",
-            "nameLocation": "464:10:10",
+            "nameLocation": "464:10:8",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1851,
+              "id": 1086,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "474:2:10"
+              "src": "474:2:8"
             },
             "returnParameters": {
-              "id": 1854,
+              "id": 1089,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1853,
+                  "id": 1088,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1855,
-                  "src": "500:13:10",
+                  "scope": 1090,
+                  "src": "500:13:8",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -177,10 +177,10 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 1852,
+                    "id": 1087,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
-                    "src": "500:6:10",
+                    "src": "500:6:8",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
                       "typeString": "string"
@@ -189,21 +189,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "499:15:10"
+              "src": "499:15:8"
             },
-            "scope": 1856,
-            "src": "455:60:10",
+            "scope": 1091,
+            "src": "455:60:8",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 1857,
-        "src": "132:385:10",
+        "scope": 1092,
+        "src": "132:385:8",
         "usedErrors": []
       }
     ],
-    "src": "107:411:10"
+    "src": "107:411:8"
   },
   "compiler": {
     "name": "solc",
@@ -211,7 +211,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.16",
-  "updatedAt": "2024-04-13T02:18:13.532Z",
+  "updatedAt": "2024-04-13T05:11:59.933Z",
   "devdoc": {
     "kind": "dev",
     "methods": {

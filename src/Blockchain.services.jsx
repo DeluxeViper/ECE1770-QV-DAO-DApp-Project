@@ -38,10 +38,10 @@ const isWalletConnected = async () => {
 
     if (accounts.length) {
       setGlobalState('connectedAccount', accounts[0].toLowerCase())
-      getInfo()
+      await getInfo()
     } else {
       setGlobalState('connectedAccount', null)
-      getInfo()
+      await getInfo()
       alert('Please connect wallet.')
       console.log('No accounts found.')
       return false
@@ -253,6 +253,38 @@ const applyNFT = async() => {
   }
 }
 
+const mintNFT = async (address) => {
+  try {
+    const contract = await getEtheriumContract()
+    const account = getGlobalState('connectedAccount')
+    await contract.methods.mintNFT(address).send({ from: account })
+  } catch (error) {
+    reportError(error)
+  }
+}
+
+const grantAdminRole = async (address) => {
+  try {
+    const contract = await getEtheriumContract()
+    const account = getGlobalState('connectedAccount')
+    await contract.methods.grantAdminRole(address).send({ from: account })
+  } catch (error) {
+    reportError(error)
+  }
+}
+
+const getAllUsers = async () => {
+  try {
+    const contract = await getEtheriumContract()
+    console.log("users");
+    const users = await contract.methods.getVoters().call()
+    console.log(users);
+    return users
+  } catch (error) {
+    reportError(error)
+  }
+}
+
 const listVoters = async (id) => {
   try {
     const contract = await getEtheriumContract()
@@ -263,6 +295,16 @@ const listVoters = async (id) => {
   }
 }
 
+const addUser = async (username) => {
+  try {
+    const contract = await getEtheriumContract()
+    const account = getGlobalState('connectedAccount')
+    await contract.methods.addVoter(username).send({ from: account })
+    window.location.reload()
+  } catch (error) {
+    reportError(error)
+  }
+}
 // const payoutBeneficiary = async (id) => {
 //   try {
 //     const contract = await getEtheriumContract()
@@ -291,5 +333,9 @@ export {
   getInfo,
   applyNFT,
   getVoter,
+  addUser,
+  getAllUsers,
+  mintNFT,
+  grantAdminRole,
 }
 

@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import { useUser } from '../../contexts/UserContext/UserContext';  // Make sure this path is correct
 import { Container, Box, Typography, TextField, Button, Grid, Link } from '@mui/material';
+import {addUser} from '../../Blockchain.services';
+import { toast } from 'react-toastify'
 
 function SignupPage() {
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const { addUser } = useUser();
-  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    addUser(username, password);
-    alert('Signup successful. You can now login.');
-    navigate('/'); // Redirect to login page or wherever appropriate after signup
+    addUser(username).then((user) => {
+      toast.success('User added successfully');
+      window.location.reload();
+    }).catch((error) => {
+      console.error("Error adding user:", error);
+      toast.error('Error adding user');
+    });
   };
 
   return (
@@ -27,7 +28,7 @@ function SignupPage() {
         }}
       >
         <Typography component="h1" variant="h5">
-          Sign Up
+          Register with QuadraDAO
         </Typography>
         <Box component="form" noValidate sx={{ mt: 1 }} onSubmit={handleSubmit}>
           <TextField
@@ -42,33 +43,14 @@ function SignupPage() {
             value={username}
             onChange={e => setUsername(e.target.value)}
           />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="new-password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
           <Button
             type="submit"
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
-            Sign Up
+            Signup
           </Button>
-          <Grid container justifyContent="flex-end">
-            <Grid item>
-              <Link component={RouterLink} to="/" variant="body2">
-                Already have an account? Sign in
-              </Link>
-            </Grid>
-          </Grid>
         </Box>
       </Box>
     </Container>

@@ -16,6 +16,7 @@ contract QuadraNFT is ERC721, ERC721URIStorage, AccessControl, EIP712, ERC721Vot
         EIP712("QuadraNFT", "1")
     {
         _grantRole(ADMIN_ROLE, msg.sender);
+        safeMint(msg.sender, "https://ipfs.io/ipfs/QmS6pfArdSefpB9F3uemwvrACdexTiQuQ1iAonMhmyBw66");
     }
     
     function grantAdminRole(address account) public onlyRole(ADMIN_ROLE) {

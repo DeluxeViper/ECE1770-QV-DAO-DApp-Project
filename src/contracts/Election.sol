@@ -11,6 +11,7 @@ contract Election is ReentrancyGuard, AccessControl {
     uint32 immutable MIN_VOTE_DURATION = 5 minutes;
     uint256 immutable MAX_TOKENS = 10;
     uint256 totalProposals;
+    uint256 totalVoters = 0;
     QuadraNFT public token;
     uint256 public daoBalance;
 
@@ -50,6 +51,7 @@ contract Election is ReentrancyGuard, AccessControl {
         string username;
         VoterStatus status;
         uint256 depositedAmount;
+        address voterAddress;
     }
 
     mapping(uint256 => Proposal) private raisedProposals;
@@ -59,7 +61,8 @@ contract Election is ReentrancyGuard, AccessControl {
     mapping(address => mapping(uint256 => uint256)) private tokensSpent;
 
     // Keep track of all voters
-    mapping(address => Voter) private voters;
+    mapping(uint256 => Voter) private voters;
+    mapping(address => uint256) private voterIds;
 
     // All vote objects for a proposal
     mapping(uint256 => Vote[]) private votedOn;
@@ -72,12 +75,19 @@ contract Election is ReentrancyGuard, AccessControl {
     constructor(QuadraNFT _token) {
         token = _token;
         _grantRole(ADMIN_ROLE, msg.sender);
-        mintNFT(msg.sender);
-        addVoter(msg.sender, "Admin", VoterStatus.VALID, 0);
+        _addVoter(msg.sender, "Admin", VoterStatus.VALID, 0);
     }
 
-    function addVoter(address account, string memory username, VoterStatus status, uint256 depositedAmount) public onlyRole(ADMIN_ROLE) {
-        voters[account] = Voter(username, status, depositedAmount);
+    function _addVoter(address account, string memory username, VoterStatus status, uint256 depositedAmount) private{
+        totalVoters++;
+        uint256 voterId = totalVoters;
+        voterIds[account] = voterId;
+        voters[voterId] = Voter(username, status, depositedAmount, account);
+    }
+
+    function addVoter(string memory username) public {
+        require(voterIds[msg.sender] == 0, "User already registered");
+        _addVoter(msg.sender, username, VoterStatus.INITIAL, 0);
     }
 
     function grantAdminRole(address account) public onlyRole(ADMIN_ROLE) {
@@ -85,7 +95,12 @@ contract Election is ReentrancyGuard, AccessControl {
     }
 
     function getVoter(address account) external view returns (Voter memory voter, bool isAdmin) {
-        voter = voters[account];
+        uint256 id = voterIds[account];
+        require(
+            id > 0,
+            "User not registered on DAO"
+        );
+        voter = voters[id];
         // add is is admin role, add a bool to reply
         if (hasRole(ADMIN_ROLE, account)) {
             isAdmin = true;
@@ -95,21 +110,39 @@ contract Election is ReentrancyGuard, AccessControl {
         return (voter, isAdmin);
     }
 
+    function getVoters() external view returns (Voter[] memory) {
+        Voter[] memory _voters = new Voter[](totalVoters);
+        for (uint256 i = 1; i <= totalVoters; i++) {
+            _voters[i-1] = voters[i];
+        }
+        return _voters;
+    }
+
     function applyNFT() public {
+        uint256 id = voterIds[msg.sender];
         require(
-            voters[msg.sender].status == VoterStatus.INITIAL,
-            "User already registered"
+            id > 0,
+            "User not registered on DAO"
         );
-        voters[msg.sender].status = VoterStatus.IN_PROGRESS;
+        require(
+            voters[id].status == VoterStatus.INITIAL,
+            "User already applied or has a NFT"
+        );
+        voters[id].status = VoterStatus.IN_PROGRESS;
     }
 
     function mintNFT(address to) public onlyRole(ADMIN_ROLE) {
+        uint256 id = voterIds[to];
         require(
-            voters[to].status == VoterStatus.IN_PROGRESS,
-            "User not registered"
+            id > 0,
+            "User not registered on DAO"
+        );
+        require(
+            voters[id].status != VoterStatus.VALID,
+            "Already minted NFT to the user"
         );
         token.safeMint(to, "https://ipfs.io/ipfs/QmS6pfArdSefpB9F3uemwvrACdexTiQuQ1iAonMhmyBw66");
-        voters[to].status = VoterStatus.VALID;
+        voters[id].status = VoterStatus.VALID;
     }
 
     function getNFTAddress() public view returns (address) {
@@ -124,11 +157,16 @@ contract Election is ReentrancyGuard, AccessControl {
     }
 
     function contribute() payable external returns (uint256) {
+        uint256 id = voterIds[msg.sender];
+        require(
+            id > 0,
+            "User not registered on DAO"
+        );
         require(msg.value > 0 ether, "Contributing zero is not allowed.");
         if (!hasRole(CONTRIBUTOR_ROLE, msg.sender)) {
             _grantRole(CONTRIBUTOR_ROLE, msg.sender);
         }
-        voters[msg.sender].depositedAmount += msg.value;
+        voters[id].depositedAmount += msg.value;
         
         daoBalance += msg.value;
 
