@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Typography, Box, Button, List, ListItem, ListItemText } from '@mui/material';
 import { useGlobalState } from '../../store';
+import { toast } from 'react-toastify';
 import "../../styles.css";
 import { getAllUsers, mintNFT, grantAdminRole } from '../../Blockchain.services';
 
@@ -12,6 +13,7 @@ function AdminPage() {
   const [user] = useGlobalState('user');
   const [contract] = useGlobalState('contract');
   const [loading, setLoading] = useState(false);
+  const [isAdminList, setIsAdminList] = useState([]);
 
   // Deploying 'QuadraDAO' contract address after running truffle migrate --reset
 
@@ -20,12 +22,13 @@ function AdminPage() {
     console.log(contract);
     getAllUsers().then((users) => {
       console.log("Users:", users);
-      setAllUsers(users);
+      setAllUsers(users[0]);
+      setIsAdminList(users[1]);
       // filter userslist to get whitelisted users
       // filter anonymous voters (who applied for NFT)
-      const anomyous = users.filter(user => {
+      const anomyous = users[0].filter(user => {
         console.log(user);
-        return user.voter.status == 1;
+        return user.status == 1;
       });
       setAnonymousVoters(anomyous);
     }).catch((error) => {
@@ -41,6 +44,9 @@ function AdminPage() {
     // Add integration logic her
     mintNFT(user.voterAddress).then(() => {
       toast.success('NFT generated successfully');
+      let temp = [...anonymousVoters];
+      temp = temp.filter((item) => item !== user);
+      setAnonymousVoters(temp);
     }).catch((error) => {
       console.error("Error generating NFT:", error);
       toast.error('Error generating NFT');
@@ -49,11 +55,14 @@ function AdminPage() {
     });
   };
 
-  const grantAdmin = async (user) => {
+  const grantAdmin = async (user,index) => {
     setLoading(true);
     console.log(`Grant Admin Role to ${user}`);
     grantAdminRole(user.voterAddress).then(() => {
       toast.success('Admin role granted successfully');
+      let temp = [...isAdminList];
+      temp[index] = true;
+      setIsAdminList(temp);
     }).catch((error) => {
       console.error("Error granting Admin role:", error);
       toast.error('Error granting Admin role');
@@ -98,7 +107,7 @@ function AdminPage() {
       <Box sx={{ mb: 2 }}>
         <Typography variant="h4">All Users</Typography>
         <List>
-          {allUsers.map((user) => (
+          {allUsers.map((user,index) => (
             <ListItem key={user}>
               <ListItemText primary={user.username} sx={{ '.MuiTypography-root': { fontSize: '1.3rem' } }} />
               <ListItemText
@@ -122,8 +131,8 @@ function AdminPage() {
                 >Generate NFT</Button>
               )}
               {
-                !user.isAdmin && (
-                  <Button disabled={loading} onClick={() => grantAdmin(user)} sx={{ backgroundColor: '#228B22', color: 'white', '&:hover': { backgroundColor: 'darkgray' }, }}>Set Admin</Button>
+                !isAdminList[index] && (
+                  <Button disabled={loading} onClick={() => grantAdmin(user,index)} sx={{ backgroundColor: '#228B22', color: 'white', '&:hover': { backgroundColor: 'darkgray' }, }}>Set Admin</Button>
                 )
               }
             </ListItem>

@@ -110,12 +110,18 @@ contract Election is ReentrancyGuard, AccessControl {
         return (voter, isAdmin);
     }
 
-    function getVoters() external view returns (Voter[] memory) {
+    function getVoters() external view returns (Voter[] memory,  bool[] memory) {
         Voter[] memory _voters = new Voter[](totalVoters);
+        bool[] memory _isAdmin = new bool[](totalVoters);
         for (uint256 i = 1; i <= totalVoters; i++) {
             _voters[i-1] = voters[i];
+            if (hasRole(ADMIN_ROLE, voters[i].voterAddress)) {
+                _isAdmin[i-1] = true;
+            }else{
+                _isAdmin[i-1] = false;
+            }
         }
-        return _voters;
+        return (_voters, _isAdmin);
     }
 
     function applyNFT() public {

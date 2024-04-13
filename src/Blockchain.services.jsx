@@ -111,7 +111,7 @@ const getInfo = async () => {
     setGlobalState('isStakeholder', isStakeholder)
     setGlobalState('user', user)
   } catch (error) {
-    reportError(error)
+    
   }
 }
 

@@ -10,6 +10,7 @@ const Banner = () => {
   const [balance] = useGlobalState('balance')
   const [user] = useGlobalState('user')
   const [amount, setAmount] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const onPropose = () => {
     // if (!isStakeholder) return
@@ -24,8 +25,13 @@ const Banner = () => {
 
   const onApplyNFT = async() => {
     if (isStakeholder) return
-    await applyNFT()
-    toast.success('NFT application received')
+    setLoading(true)
+    await applyNFT().then(() => {
+      toast.success('NFT application received')
+      window.location.reload()
+    }).catch((error) => {
+      toast.error('Error applying for NFT')
+    }).finally(() => setLoading(false))
   }
 
   const onAdminPage = () => {
@@ -72,8 +78,9 @@ const Banner = () => {
           data-mdb-ripple="true"
           data-mdb-ripple-color="light"
           onClick={onApplyNFT}
+          disabled={loading}
           >
-          Apply for NFT
+            {loading ? 'Applying...' : 'Apply for NFT'}
           </button>}
         {user && user.isAdmin &&
         <button
