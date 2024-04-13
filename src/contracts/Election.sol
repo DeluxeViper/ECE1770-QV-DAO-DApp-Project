@@ -6,11 +6,13 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./QuadraNFT.sol";
 
 contract Election is ReentrancyGuard, AccessControl {
-    bytes32 public immutable ADMIN_ROLE = keccak256("ADMIN_ROLE");
+    bytes32 private immutable ADMIN_ROLE = keccak256("ADMIN_ROLE");
+    bytes32 private immutable CONTRIBUTOR_ROLE = keccak256("CONTRIBUTOR");
     uint32 immutable MIN_VOTE_DURATION = 5 minutes;
     uint256 immutable MAX_TOKENS = 10;
     uint256 totalProposals;
     QuadraNFT public token;
+    uint256 public daoBalance;
 
     struct Candidate {
         uint256 id;
@@ -47,7 +49,7 @@ contract Election is ReentrancyGuard, AccessControl {
     struct Voter {
         string username;
         VoterStatus status;
-        uint256 weight;
+        uint256 depositedAmount;
     }
 
     mapping(uint256 => Proposal) private raisedProposals;
@@ -70,14 +72,11 @@ contract Election is ReentrancyGuard, AccessControl {
     constructor(QuadraNFT _token) {
         token = _token;
         _grantRole(ADMIN_ROLE, msg.sender);
-        addVoter(msg.sender, "Admin", 1, VoterStatus.VALID);
+        addVoter(msg.sender, "Admin", VoterStatus.VALID, 0);
     }
 
-    function addVoter(address account, string memory username, uint256 weight, VoterStatus status) private {
-        if (voters[account].status != VoterStatus.INITIAL) {
-            return;
-        }
-        voters[account] = Voter(username, status, weight);
+    function addVoter(address account, string memory username, VoterStatus status, uint256 depositedAmount) public onlyRole(ADMIN_ROLE) {
+        voters[account] = Voter(username, status, depositedAmount);
     }
 
     function grantAdminRole(address account) public onlyRole(ADMIN_ROLE) {
@@ -100,18 +99,39 @@ contract Election is ReentrancyGuard, AccessControl {
             voters[msg.sender].status == VoterStatus.INITIAL,
             "User already registered"
         );
-        voters[msg.sender] = Voter("Anonymous", VoterStatus.IN_PROGRESS, 1);
+        voters[msg.sender].status = VoterStatus.IN_PROGRESS;
+    }
+
+    function mintNFT(address to) public onlyRole(ADMIN_ROLE) {
+        require(
+            voters[to].status == VoterStatus.IN_PROGRESS,
+            "User not registered"
+        );
+        token.safeMint(to, "https://ipfs.io/ipfs/QmS6pfArdSefpB9F3uemwvrACdexTiQuQ1iAonMhmyBw66");
+        voters[to].status = VoterStatus.VALID;
     }
 
     function getNFTAddress() public view returns (address) {
         return address(token);
     }
 
-    function _isStakeholder(address _voter) public view returns (bool) {
+    function isStakeholder(address _voter) public view returns (bool) {
         // if the voter has a token in the Token contract
         // cast the function BalanceOf to the token contract QUadraDAO with address _token
         if(token.balanceOf(_voter) > 0) return true;
         return false;
+    }
+
+    function contribute() payable external returns (uint256) {
+        require(msg.value > 0 ether, "Contributing zero is not allowed.");
+        if (!hasRole(CONTRIBUTOR_ROLE, msg.sender)) {
+            _grantRole(CONTRIBUTOR_ROLE, msg.sender);
+        }
+        voters[msg.sender].depositedAmount += msg.value;
+        
+        daoBalance += msg.value;
+
+        return daoBalance;
     }
 
     function quadraticVote(uint256 voted, uint256 new_votes) public pure returns (uint) {
@@ -127,6 +147,9 @@ contract Election is ReentrancyGuard, AccessControl {
         string calldata description,
         string[] memory _candidateNames
     ) external returns (Proposal memory) {
+        require(
+            hasRole(ADMIN_ROLE, msg.sender) || isStakeholder(msg.sender), "Only Admins and Stakeholders can create proposals"
+        );
         uint256 proposalId = totalProposals++;
         Proposal storage proposal = raisedProposals[proposalId];
         proposal.id = proposalId;
@@ -179,6 +202,9 @@ contract Election is ReentrancyGuard, AccessControl {
         uint256 candidateId,
         uint256 numVotes
     ) public returns (Candidate memory) {
+        require(
+            hasRole(ADMIN_ROLE, msg.sender) || isStakeholder(msg.sender), "Only Admins and Stakeholders can vote"
+        );
         Proposal storage proposal = raisedProposals[proposalId];
         Candidate[] memory candidates = proposal.candidates;
 

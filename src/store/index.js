@@ -1,9 +1,11 @@
+
 import { createGlobalState } from 'react-hooks-global-state'
 import moment from 'moment'
 
 const { setGlobalState, useGlobalState, getGlobalState } = createGlobalState({
   createModal: 'scale-0',
   connectedAccount: '',
+  user: null,
   contract: null,
   proposals: [],
   isStakeholder: false,

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useGlobalState, setGlobalState } from '../store'
 import { toast } from 'react-toastify'
-// import { performContribute } from '../Blockchain.services'
+import { performContribute } from '../Blockchain.services'
 
 const Banner = () => {
   const [isStakeholder] = useGlobalState('isStakeholder')
@@ -17,7 +17,7 @@ const Banner = () => {
 
   const onContribute = async () => {
     if (!!!amount || amount == '') return
-    // await performContribute(amount)
+    await performContribute(amount)
     toast.success('Contribution received')
   }
 

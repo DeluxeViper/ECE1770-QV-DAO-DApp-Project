@@ -14,6 +14,9 @@ const connectWallet = async () => {
     setGlobalState('connectedAccount', accounts[0].toLowerCase())
     console.log("setGlobalState");
     console.log(accounts[0].toLowerCase())
+    const user = await getVoter(accounts[0])
+    setGlobalState('user', user)
+    console.log("user");
   } catch (error) {
     reportError(error)
   }
@@ -35,7 +38,10 @@ const isWalletConnected = async () => {
 
     if (accounts.length) {
       setGlobalState('connectedAccount', accounts[0].toLowerCase())
+      getInfo()
     } else {
+      setGlobalState('connectedAccount', null)
+      getInfo()
       alert('Please connect wallet.')
       console.log('No accounts found.')
       return false
@@ -66,41 +72,49 @@ const getEtheriumContract = async () => {
   }
 }
 
-// const performContribute = async (amount) => {
-//   try {
-//     amount = window.web3.utils.toWei(amount.toString(), 'ether')
-//     const contract = await getEtheriumContract()
-//     const account = getGlobalState('connectedAccount')
-//
-//     await contract.methods.contribute().send({ from: account, value: amount })
-//
-//     window.location.reload()
-//   } catch (error) {
-//     reportError(error)
-//     return error
-//   }
-// }
+const performContribute = async (amount) => {
+  try {
+    amount = window.web3.utils.toWei(amount.toString(), 'ether')
+    const contract = await getEtheriumContract()
+    const account = getGlobalState('connectedAccount')
 
-// const getInfo = async () => {
-//   try {
-//     if (!ethereum) return alert('Please install Metamask')
-//
-//     const contract = await getEtheriumContract()
-//     const connectedAccount = getGlobalState('connectedAccount')
-//     const isStakeholder = await contract.methods
-//       .isStakeholder()
-//       .call({ from: connectedAccount })
-//     const balance = await contract.methods.daoBalance().call()
-//     const mybalance = await contract.methods
-//       .getBalance()
-//       .call({ from: connectedAccount })
-//     setGlobalState('balance', window.web3.utils.fromWei(balance))
-//     setGlobalState('mybalance', window.web3.utils.fromWei(mybalance))
-//     setGlobalState('isStakeholder', isStakeholder)
-//   } catch (error) {
-//     reportError(error)
-//   }
-// }
+    await contract.methods.contribute().send({ from: account, value: amount })
+
+    window.location.reload()
+  } catch (error) {
+    reportError(error)
+    return error
+  }
+}
+
+const getInfo = async () => {
+  try {
+    if (!ethereum) return alert('Please install Metamask')
+
+    const contract = await getEtheriumContract()
+    const connectedAccount = getGlobalState('connectedAccount')
+    const balance = await contract.methods.daoBalance().call()
+    setGlobalState('balance', window.web3.utils.fromWei(balance))
+    if (!connectedAccount) {
+      setGlobalState('isStakeholder', false)
+      setGlobalState('user', null)
+      setGlobalState('mybalance', 0)
+      return
+    }
+    const isStakeholder = await contract.methods
+      .isStakeholder(connectedAccount)
+      .call()
+    const user = await getVoter(connectedAccount)
+    // const mybalance = await contract.methods
+    //   .getBalance()
+    //   .call({ from: connectedAccount })
+    // setGlobalState('mybalance', window.web3.utils.fromWei(mybalance))
+    setGlobalState('isStakeholder', isStakeholder)
+    setGlobalState('user', user)
+  } catch (error) {
+    reportError(error)
+  }
+}
 
 const raiseProposal = async ({ title, description, candidateNames }) => {
   try {
@@ -212,6 +226,17 @@ const voteOnProposal = async (proposalId, candidateId, numVotes) => {
   }
 }
 
+const getVoter = async (address) => {
+  try {
+    const contract = await getEtheriumContract()
+    // const account = getGlobalState('connectedAccount')
+    const voter = await contract.methods.getVoter(address).call()
+    return voter
+  } catch (error) {
+    reportError(error)
+  }
+}
+
 const listVoters = async (id) => {
   try {
     const contract = await getEtheriumContract()
@@ -246,5 +271,8 @@ export {
   getProposal,
   voteOnProposal,
   listVoters,
+  performContribute,
+  getInfo,
+  getVoter,
 }
 
