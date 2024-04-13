@@ -85,10 +85,9 @@ const CandidatesList = ({ proposal }) => {
                       </div>
                     </td>
                     <td className="text-sm font-light px-6 py-4 whitespace-nowrap">
-                      <div className="flex">
                       <input
                         type="number"
-                        className="form-control block px-3 py-1.5 mr-5
+                        className="form-control block w-full px-3 py-1.5
           text-base font-normaltext-gray-700
           bg-clip-padding border border-solid border-gray-300
           rounded transition ease-in-out m-0 shadow-md
@@ -115,7 +114,6 @@ const CandidatesList = ({ proposal }) => {
                       >
                         Vote
                       </button>
-                      </div>
                     </td>
                   </tr>
                 ))}

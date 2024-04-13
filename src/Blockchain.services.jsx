@@ -14,6 +14,9 @@ const connectWallet = async () => {
     setGlobalState('connectedAccount', accounts[0].toLowerCase())
     console.log("setGlobalState");
     console.log(accounts[0].toLowerCase())
+    const user = await getVoter(accounts[0])
+    setGlobalState('user', user)
+    console.log("user");
   } catch (error) {
     reportError(error)
   }
@@ -35,9 +38,13 @@ const isWalletConnected = async () => {
 
     if (accounts.length) {
       setGlobalState('connectedAccount', accounts[0].toLowerCase())
+      await getInfo()
     } else {
+      setGlobalState('connectedAccount', null)
+      await getInfo()
       alert('Please connect wallet.')
       console.log('No accounts found.')
+      return false
     }
   } catch (error) {
     reportError(error)
@@ -65,43 +72,50 @@ const getEtheriumContract = async () => {
   }
 }
 
-// const performContribute = async (amount) => {
-//   try {
-//     amount = window.web3.utils.toWei(amount.toString(), 'ether')
-//     const contract = await getEtheriumContract()
-//     const account = getGlobalState('connectedAccount')
-//
-//     await contract.methods.contribute().send({ from: account, value: amount })
-//
-//     window.location.reload()
-//   } catch (error) {
-//     reportError(error)
-//     return error
-//   }
-// }
+const performContribute = async (amount) => {
+  try {
+    amount = window.web3.utils.toWei(amount.toString(), 'ether')
+    const contract = await getEtheriumContract()
+    const account = getGlobalState('connectedAccount')
 
-// const getInfo = async () => {
-//   try {
-//     if (!ethereum) return alert('Please install Metamask')
-//
-//     const contract = await getEtheriumContract()
-//     const connectedAccount = getGlobalState('connectedAccount')
-//     const isStakeholder = await contract.methods
-//       .isStakeholder()
-//       .call({ from: connectedAccount })
-//     const balance = await contract.methods.daoBalance().call()
-//     const mybalance = await contract.methods
-//       .getBalance()
-//       .call({ from: connectedAccount })
-//     setGlobalState('balance', window.web3.utils.fromWei(balance))
-//     setGlobalState('mybalance', window.web3.utils.fromWei(mybalance))
-//     setGlobalState('isStakeholder', isStakeholder)
-//   } catch (error) {
-//     reportError(error)
-//   }
-// }
+    await contract.methods.contribute().send({ from: account, value: amount })
 
-const raiseProposal = async ({ title, description, candidateNames, maxTokensPerAddress, qvEnabled, linearTimeDecayEnabled }) => {
+    window.location.reload()
+  } catch (error) {
+    reportError(error)
+    return error
+  }
+}
+
+const getInfo = async () => {
+  try {
+    if (!ethereum) return alert('Please install Metamask')
+
+    const contract = await getEtheriumContract()
+    const connectedAccount = getGlobalState('connectedAccount')
+    const balance = await contract.methods.daoBalance().call()
+    setGlobalState('balance', window.web3.utils.fromWei(balance))
+    if (!connectedAccount) {
+      setGlobalState('isStakeholder', false)
+      setGlobalState('user', null)
+      setGlobalState('mybalance', 0)
+      return
+    }
+    const isStakeholder = await contract.methods
+      .isStakeholder(connectedAccount)
+      .call()
+    const user = await getVoter(connectedAccount)
+    // const mybalance = await contract.methods
+    //   .getBalance()
+    //   .call({ from: connectedAccount })
+    setGlobalState('isStakeholder', isStakeholder)
+    setGlobalState('user', user)
+  } catch (error) {
+    
+  }
+}
+
+const raiseProposal = async ({ title, description, candidateNames }) => {
   try {
     // amount = window.web3.utils.toWei(amount.toString(), 'ether')
     const contract = await getEtheriumContract()
@@ -109,15 +123,10 @@ const raiseProposal = async ({ title, description, candidateNames, maxTokensPerA
 
     console.log("candidateNames");
     console.log(candidateNames);
-    console.log("maxtokensperaddress");
-    console.log(maxTokensPerAddress);
-    console.log("qvEnabled");
-    console.log(linearTimeDecayEnabled);
 
     const candidateNamesArr = candidateNames.split(",");
-    console.log(candidateNamesArr);
     await contract.methods
-      .createProposal(title, description, candidateNamesArr, maxTokensPerAddress, qvEnabled, linearTimeDecayEnabled)
+      .createProposal(title, description, candidateNamesArr)
       .send({ from: account })
 
     window.location.reload()
@@ -149,15 +158,18 @@ const structuredProposals = (proposals) => {
   return proposals
     .map((proposal) => ({
       id: proposal.id,
+      // amount: window.web3.utils.fromWei(proposal.amount),
       title: proposal.title,
       description: proposal.description,
+      // paid: proposal.paid,
+      // passed: proposal.passed,
       proposer: proposal.proposer,
+      // upvotes: Number(proposal.upvotes),
+      // downvotes: Number(proposal.downvotes),
+      // beneficiary: proposal.beneficiary,
+      // executor: proposal.executor,
       duration: proposal.duration,
-      candidates: proposal.candidates, // TODO: Get CANDIDATES
-      totalVotes: proposal.totalVotes,
-      maxTokensPerAddress: proposal.maxTokensPerAddress,
-      qvEnabled: proposal.qvEnabled,
-      linearTimeDecayEnabled: proposal.linearTimeDecayEnabled
+      candidates: proposal.candidates // TODO: Get CANDIDATES
     }))
     .reverse()
 }
@@ -181,17 +193,13 @@ const getProposal = async (id) => {
       proposer: proposal.proposer,
       duration: proposal.duration,
       candidates: proposal.candidates,
-      totalVotes: proposal.totalVotes,
-      maxTokensPerAddress: proposal.maxTokensPerAddress,
-      qvEnabled: proposal.qvEnabled,
-      linearTimeDecayEnabled: proposal.linearTimeDecayEnabled
     }
 
     // console.log("old proposals")
     // console.log(getGlobalState('proposals'))
     // console.log("new proposals")
     // console.log(newProposals)
-
+    
 
     setGlobalState('proposals', newProposals)
 
@@ -210,32 +218,72 @@ const voteOnProposal = async (proposalId, candidateId, numVotes) => {
     await contract.methods
       .voteForCandidate(proposalId, candidateId, numVotes)
       .send({ from: account })
-      .on('error', function(error, receipt) {
-        console.log("error");
-        console.log(error);
-      })
 
     window.location.reload()
   } catch (error) {
-    // reportError(error)
-    return error;
+    reportError(error)
   }
 }
 
-// const getTokensLeftForProposal = async (proposalId) => {
-//   try {
-//     const contract = await getEtheriumContract()
-//     const account = getGlobalState('connectedAccount')
-//     return await contract.methods
-//       .getTokensLeftForProposal(proposalId)
-//       .send({ from: account })
-//
-//
-//   } catch (error) {
-//     reportError(error)
-//     return error;
-//   }
-// }
+const getVoter = async (address) => {
+  try {
+    const contract = await getEtheriumContract()
+    // const account = getGlobalState('connectedAccount')
+    const res = await contract.methods.getVoter(address).call()
+    console.log(res);
+    const voter = {
+      deposited: window.web3.utils.fromWei(res.voter.depositedAmount),
+      isAdmin: res.isAdmin,
+      status: res.voter.status,
+      username: res.voter.username,
+    }
+    return voter
+  } catch (error) {
+    reportError(error)
+  }
+}
+
+const applyNFT = async() => {
+  try {
+    const contract = await getEtheriumContract()
+    const account = getGlobalState('connectedAccount')
+    await contract.methods.applyNFT().send({ from: account })
+  } catch (error) {
+    reportError(error)
+  }
+}
+
+const mintNFT = async (address) => {
+  try {
+    const contract = await getEtheriumContract()
+    const account = getGlobalState('connectedAccount')
+    await contract.methods.mintNFT(address).send({ from: account })
+  } catch (error) {
+    reportError(error)
+  }
+}
+
+const grantAdminRole = async (address) => {
+  try {
+    const contract = await getEtheriumContract()
+    const account = getGlobalState('connectedAccount')
+    await contract.methods.grantAdminRole(address).send({ from: account })
+  } catch (error) {
+    reportError(error)
+  }
+}
+
+const getAllUsers = async () => {
+  try {
+    const contract = await getEtheriumContract()
+    console.log("users");
+    const users = await contract.methods.getVoters().call()
+    console.log(users);
+    return users
+  } catch (error) {
+    reportError(error)
+  }
+}
 
 const listVoters = async (id) => {
   try {
@@ -247,6 +295,16 @@ const listVoters = async (id) => {
   }
 }
 
+const addUser = async (username) => {
+  try {
+    const contract = await getEtheriumContract()
+    const account = getGlobalState('connectedAccount')
+    await contract.methods.addVoter(username).send({ from: account })
+    window.location.reload()
+  } catch (error) {
+    reportError(error)
+  }
+}
 // const payoutBeneficiary = async (id) => {
 //   try {
 //     const contract = await getEtheriumContract()
@@ -271,6 +329,13 @@ export {
   getProposal,
   voteOnProposal,
   listVoters,
-  // getTokensLeftForProposal,
+  performContribute,
+  getInfo,
+  applyNFT,
+  getVoter,
+  addUser,
+  getAllUsers,
+  mintNFT,
+  grantAdminRole,
 }
 
