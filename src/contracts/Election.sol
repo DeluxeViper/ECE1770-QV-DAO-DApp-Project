@@ -72,6 +72,7 @@ contract Election is ReentrancyGuard, AccessControl {
     constructor(QuadraNFT _token) {
         token = _token;
         _grantRole(ADMIN_ROLE, msg.sender);
+        mintNFT(msg.sender);
         addVoter(msg.sender, "Admin", VoterStatus.VALID, 0);
     }
 

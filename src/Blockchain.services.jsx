@@ -108,7 +108,6 @@ const getInfo = async () => {
     // const mybalance = await contract.methods
     //   .getBalance()
     //   .call({ from: connectedAccount })
-    // setGlobalState('mybalance', window.web3.utils.fromWei(mybalance))
     setGlobalState('isStakeholder', isStakeholder)
     setGlobalState('user', user)
   } catch (error) {
@@ -230,8 +229,25 @@ const getVoter = async (address) => {
   try {
     const contract = await getEtheriumContract()
     // const account = getGlobalState('connectedAccount')
-    const voter = await contract.methods.getVoter(address).call()
+    const res = await contract.methods.getVoter(address).call()
+    console.log(res);
+    const voter = {
+      deposited: window.web3.utils.fromWei(res.voter.depositedAmount),
+      isAdmin: res.isAdmin,
+      status: res.voter.status,
+      username: res.voter.username,
+    }
     return voter
+  } catch (error) {
+    reportError(error)
+  }
+}
+
+const applyNFT = async() => {
+  try {
+    const contract = await getEtheriumContract()
+    const account = getGlobalState('connectedAccount')
+    await contract.methods.applyNFT().send({ from: account })
   } catch (error) {
     reportError(error)
   }
@@ -273,6 +289,7 @@ export {
   listVoters,
   performContribute,
   getInfo,
+  applyNFT,
   getVoter,
 }
 

@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { useGlobalState, setGlobalState } from '../store'
 import { toast } from 'react-toastify'
-import { performContribute } from '../Blockchain.services'
+import { performContribute, applyNFT } from '../Blockchain.services'
+import { Divider,Box, Button } from '@mui/material'
 
 const Banner = () => {
   const [isStakeholder] = useGlobalState('isStakeholder')
   const [proposals] = useGlobalState('proposals')
   const [balance] = useGlobalState('balance')
-  const [mybalance] = useGlobalState('mybalance')
+  const [user] = useGlobalState('user')
   const [amount, setAmount] = useState('')
 
   const onPropose = () => {
@@ -21,6 +22,16 @@ const Banner = () => {
     toast.success('Contribution received')
   }
 
+  const onApplyNFT = async() => {
+    if (isStakeholder) return
+    await applyNFT()
+    toast.success('NFT application received')
+  }
+
+  const onAdminPage = () => {
+    window.location.href = '/admin'
+  }
+
   const opened = () =>
     proposals.filter(
       (proposal) => new Date().getTime() < Number(proposal.duration + '000'),
@@ -31,14 +42,59 @@ const Banner = () => {
       <h2 className="font-semibold text-3xl mb-5">
         {opened()} Proposal{opened() == 1 ? '' : 's'} Currently Opened
       </h2>
-      <p>
-        Current DAO Balance: <strong>{balance} Eth</strong> <br />
-        Your contributions:{' '}
-        <span>
-          <strong>{mybalance} Eth</strong>
-          {isStakeholder ? ', and you are now a stakeholder 😊' : null}
-        </span>
-      </p>
+      <Box display={'flex'} sx={{justifyContent:'space-between'}}>
+        <Box width={'30%'} minWidth={'250px'}>
+          <p>
+          Current DAO Balance: <strong>{balance} Eth</strong> <br />
+          Your contributions:{' '}
+          <span>
+            <strong>{user ? user.deposited:0} Eth</strong>
+          </span>
+        </p>
+        </Box>
+        <Divider orientation='vertical' flexItem />
+        <Box justifyContent={'center'} justifyItems={'center'} justifySelf={'center'} alignItems={'center'} display={'flex'} flexDirection={'column'} padding={1}>
+          {user && user.isAdmin ? <p>Your are <strong>Admin</strong></p> : 
+          isStakeholder ? <p>Your are <strong>Stakeholder</strong></p> : 'You are not yet a stakeholder, apply for NFT '}
+        </Box>
+        <Box flex={1} display={'flex'} justifyContent={'flex-end'} sx={{gap:2}} flexWrap={'wrap'}>
+          {user && !isStakeholder && user.status == 0 &&
+            <button
+            type="button"
+            className={`inline-block px-6 py-2.5
+            bg-blue-600 text-white font-medium text-xs
+            leading-tight uppercase shadow-md rounded-full
+            hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700
+            focus:shadow-lg focus:outline-none focus:ring-0
+            active:bg-blue-800 active:shadow-lg transition
+            duration-150 ease-in-out dark:text-blue-500
+            dark:border dark:border-blue-500 dark:bg-transparent`}
+          data-mdb-ripple="true"
+          data-mdb-ripple-color="light"
+          onClick={onApplyNFT}
+          >
+          Apply for NFT
+          </button>}
+        {user && user.isAdmin &&
+        <button
+            type="button"
+            className={`inline-block px-6 py-2.5
+            bg-blue-600 text-white font-medium text-xs
+            leading-tight uppercase shadow-md rounded-full
+            hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700
+            focus:shadow-lg focus:outline-none focus:ring-0
+            active:bg-blue-800 active:shadow-lg transition
+            duration-150 ease-in-out dark:text-blue-500
+            dark:border dark:border-blue-500 dark:bg-transparent`}
+          data-mdb-ripple="true"
+          data-mdb-ripple-color="light"
+          onClick={onAdminPage}
+        >
+          Go to Admin Page
+        </button>
+        }
+        </Box>
+      </Box>
       <hr className="my-6 border-gray-300 dark:border-gray-500" />
       <div className="flex flex-row justify-start items-center md:w-1/3 w-full mt-4">
         <input
