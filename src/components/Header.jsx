@@ -40,7 +40,7 @@ const Header = () => {
               className="flex flex-row justify-start items-center space-x-3"
             >
               <SiHiveBlockchain className="cursor-pointer" size={25} />
-              <span className="invisible md:visible dark:text-gray-300">
+              <span className="md:visible dark:text-gray-300">
                 Quadratic Voting DAO DApp 
               </span>
             </Link>

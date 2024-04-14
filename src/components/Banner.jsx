@@ -51,6 +51,9 @@ const Banner = () => {
       <Box display={'flex'} sx={{justifyContent:'space-between'}}>
         <Box width={'30%'} minWidth={'250px'}>
           <p>
+            User: {user.username}
+          </p>
+          <p>
           Current DAO Balance: <strong>{balance} Eth</strong> <br />
           Your contributions:{' '}
           <span>
@@ -60,8 +63,8 @@ const Banner = () => {
         </Box>
         <Divider orientation='vertical' flexItem />
         <Box justifyContent={'center'} justifyItems={'center'} justifySelf={'center'} alignItems={'center'} display={'flex'} flexDirection={'column'} padding={1}>
-          {user && user.isAdmin ? <p>Your are <strong>Admin</strong></p> : 
-          isStakeholder ? <p>Your are <strong>Stakeholder</strong></p> : 'You are not yet a stakeholder, apply for NFT '}
+          {user && user.isAdmin ? <p>You are <strong>Admin</strong></p> : 
+          isStakeholder ? <p>You are <strong>Stakeholder</strong></p> : 'You are not yet a stakeholder, apply for NFT '}
         </Box>
         <Box flex={1} display={'flex'} justifyContent={'flex-end'} sx={{gap:2}} flexWrap={'wrap'}>
           {user && !isStakeholder && user.status == 0 &&
