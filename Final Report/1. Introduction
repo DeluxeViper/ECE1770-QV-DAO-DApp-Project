@@ -1,1 +1,15 @@
+Title of Project: True Democratic Consensus Mechanism for DAO Governance 
 
+Introduction 
+
+Background
+Voting and Democracy have existed since their development in 508B.C. Ancient Greece to give the power of governance to the hands of the masses. Voting allows individual users to voice their opinion on current topics and how they should be executed. With the principles of voting in mind, many nations have a democratic government formed upon the votes cast by all citizens. Due to deviation from democracy and poor voting practices at large scales, voters are choosing not to vote in elections. The decline is constant throughout the years. In similar pursuits, each blockchain decentralized autonomous organization (DAO) uses a voting process so that members of the DAO can vote on governance and relevant proposals. The benefits of DAO voting are similar as they allow members to truly be in charge of the decisions their organization makes. Despite this sense of ownership, blockchains DAO voting can also decline due to unfair practices.  
+
+Motivation
+Deploy a consensus mechanism to optimize the voter experience, trust in elections and turnout. The goal is to return true democracy to voting by instilling fairness for all voters. 
+
+Context
+The DAO uses a consensus system to make any decision for the organization. This system consists of a proposal and the opportunity for each member to vote on their preferred outcome. The outcome implemented by the DAO is determined by most votes at the end of the consensus. Although the goal is to best represent all the members of the DAO, voting mechanisms often favour the wealthy since they are able to purchase more voting tokens which can imbalance the majority and implementation of the proposal overall.  Not to mention, electronic voting mechanisms are also susceptible to external security attacks, hackers and corruption. This lack of itegrity and fairness in the DAO vote deters voter engagement and further misrepresents the outcome of the vote.  
+
+Problem Statement 
+We propose a blockchain DAO based voting system with the integration of a time decay function within a quadratic voting system. This innovative approach, enhanced by a whitelist to verify eligible voters and mechanisms for anonymous voting to protect voter privacy, aims to boost early voter participation, increase overall turnout, and create a more secure, inclusive electronic electoral process. This combination is anticipated to better reflect the community's preferences and increase trust in the consensus system. 
