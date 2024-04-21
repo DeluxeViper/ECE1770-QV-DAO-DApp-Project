@@ -47,15 +47,39 @@ Use `--network sepolia` flag if you want to deploy on sepolia
 Visit this URL in your browser: http://localhost:3000
 
 
+## Step 6. Managing User accounts
+
+Once ganache-cli has started you should see several private keys and available accounts.
+
+#### Access Admin account.
+
+Note that the first account will always be the admin account. To add the admin account, import the first private
+to Metamask.
+
+#### Access other accounts.
+
+To add other accounts, import other private keys into Metamask and connect them to the website.
+Then you should be able to automatically register them by the prompt shown in the DApp after you refresh it.
+
+To move through different accounts, simply click through different accounts on Metamask.
+
+
+#### Accounts Creating proposals
+
+Admin accounts automatically have full access to create proposals.
+
+In order to create proposals for non-admin accounts, they must be a `Stakeholder`, in other words you must apply for an NFT
+(via the apply button on the main page), and an admin account must click on the `Generate NFT` button to approve it.
+
+Once the non-admin account becomes a `Stakeholder`, they can create proposals.
+
+
 -----------------------------
-
-
-
 ## Installation
 
 
 
-## Configeration
+## Configuration
 At root folder, create an .env file:
 
 ```
@@ -69,7 +93,7 @@ To use the Github Action to deploy on Sepolia and Azure, you need to add the abo
 ## Notes 
 
 ## FAQ
-- **How to access different user priviledges?**
+- **How to access different user privileges?**
    For admin roles, signup then login with username and password both to 'admin' (NOTE: case sensitive, all lowercase). It will take you to list of all users where you can whitelist them and mint nfts for them.
 
    For normal user/voter, sign up and login with any username or password, where you can request to get whitelisted and access nfts for anonymous voting. 
