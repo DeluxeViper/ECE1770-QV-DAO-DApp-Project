@@ -1,1 +1,28 @@
+Solutions 
 
+## Key Features 
+
+Proposal
+The consensus system allows users to submit a proposal to be voted on. Alongside the proposal, the voting options can also be submitted so that votes are cast towards a specific option. The proposal also has an expiry time so that voting opens and closes appropriately. This also prompts users to cast their votes within the timeframe to reach a decision. The submitter can also put a description of the proposal and provide any additional information needed. This mimics typical voting in real life such as for the election day of governmental elections. The proposal system can be beneficial to allow clear decisions to be made in an efficient manner representative of the members' opinion without the need to hours of boardroom discussions.  
+
+Voting
+The system allows users to log in and view all proposals and cast their votes for each proposal. The users can vote on the proposals by selecting any of the options provided for the proposal. The votes must be cast within the timeframe before the proposal expires. The voting is anonymous so members cannot see the specific option selected by other, only the total number of votes for each option.  
+
+Accounts
+The consensus system requires the registration of all users with a valid MetaMask wallet. This extra privacy ensures only concerned users can access the system. The need for a MetaMask wallet also adds a layer of protection from bots who may spam the system. The need to register for the account also can help users keep track of current proposals and previous votes all in one place. The account for each user is also part of the user experience and adds to the feeling of membership and ownership which could motivate the user to engage in voting.  
+
+Dark & Light Mode
+The system features both light and dark modes as part of the user interface. This can be ergonomic as it promotes efficiency and comfort for users. This is also an accessible solution as some users require a certain lighting condition due to visual abilities and impairments. The dark and light mode settings enhance the user experience of the system promoting user engagement which will carry over to the voter engagement.   
+
+Account Types 
+
+General User
+General users also knows as voters of the system are able to login to the system. View all proposals that are submitted, current and historical. General voters can view all the votes for current and historical proposals. They can vote on any current proposals. General voters can request NFTs. 
+
+Admin Accounts
+Admin users can do all the functions as general users and have additional capabilities. Admis users can submit proposals for all users to vote on. Admins are able to grant NFTs to general users. Admin accounts can change the status of any general user account to an admin account.  
+
+Analytics Dashboard 
+
+Benchmarking  
+Due to the nature of the system deployed the following values are improved on compared to traditional voting mechanisms. When compared to traditioanl voting system, sne area of improvement is Availability. Using Blockchain voting allows technology and voting from anywhere access to a device and stable internet connection.  Another area of improvement is Voting Goals. Voting goals and targets can be monitored easily by members of the DAO governance. The easy to use system can increase voter turnout to meet voting goals. The system increases Transparency. The system allows the voting process to be transparent by clearly displaying all open and closed proposals and the number of votes per option at any given point in time. The system aEquipment: Use of this blockchain voting system allows higher user voting with limited resources and personnel needed. The system increases Responsibility as votes must be cast in an informed yet timely manner. This system instills voter trust.  The improved voting mechanism and limited chance for internal corruption improves voter trust in the governance. Finally, the system increases integrity by verification of users and removing the chance of attacks   
