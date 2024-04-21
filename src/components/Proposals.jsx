@@ -1,7 +1,7 @@
 import Identicon from 'react-identicons'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { truncate, useGlobalState, daysRemaining } from '../store'
+import { truncate, useGlobalState, daysRemaining, timeRemaining } from '../store'
 // import { payoutBeneficiary } from "../Blockchain.services";
 import { toast } from 'react-toastify'
 
@@ -120,9 +120,7 @@ const Proposals = () => {
                       {proposal.title.substring(0, 80) + '...'}
                     </td>
                     <td className="text-sm font-light px-6 py-4 whitespace-nowrap">
-                      {new Date().getTime() > Number(proposal.duration + '000')
-                        ? 'Expired'
-                        : daysRemaining(proposal.duration)}
+                      {timeRemaining(proposal?.duration)}
                     </td>
                     <td
                       className="flex justify-start items-center space-x-3

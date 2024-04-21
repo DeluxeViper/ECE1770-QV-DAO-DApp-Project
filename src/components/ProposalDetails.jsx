@@ -10,7 +10,7 @@ import {
   Legend,
   Tooltip,
 } from 'recharts'
-import { daysRemaining, minutesRemaining, hoursRemaining } from '../store'
+import { timeRemaining, daysRemaining, minutesRemaining, hoursRemaining } from '../store'
 // import { getTokensLeftForProposal } from "../Blockchain.services";
 
 const ProposalDetails = ({ proposal, data, voters }) => {
@@ -32,26 +32,6 @@ const ProposalDetails = ({ proposal, data, voters }) => {
     return colorMap[number] || "#000000"; // Default to black if color is not defined
   }
 
-  const timeRemaining = () => {
-    const daysRem = daysRemaining(proposal?.duration);
-    //
-    // const minutesRem = minutesRemaining(proposal?.duration);
-    // 
-    // console.log("minutes remainiing: " + minutesRem);
-
-    // if (daysRem === '1 day' || daysRem === '0 days') {
-    //   const hourRem = hoursRemaining(proposal?.duration);
-    //    
-    //   if (hourRem === '1 hour' || hourRem === '0 hours') {
-    //     return minutesRemaining(proposal?.duration)
-    //   }
-    //
-    //   return hourRem;
-    // }
-
-    return daysRem;
-  }
-
   return (
     <div className="p-8">
       <h2 className="font-semibold text-3xl mb-5">{proposal?.title}</h2>
@@ -59,7 +39,7 @@ const ProposalDetails = ({ proposal, data, voters }) => {
         {new Date().getTime() > Number(proposal?.duration + '000')
           ? <>
             and this proposal has ended.
-          </> : <> and will expire in <strong>{timeRemaining()}</strong></>}</p>
+          </> : <> and will expire in <strong>{timeRemaining(proposal?.duration)}</strong></>}</p>
       <p>
         You currently have <strong>{}</strong> tokens left for this proposal.
       </p>

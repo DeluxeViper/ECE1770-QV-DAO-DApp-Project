@@ -34,32 +34,63 @@ const daysRemaining = (days) => {
   return days == 1 ? '1 day' : days + ' days'
 }
 
-// const minutesRemaining = (minutes) => {
-// function timeDifferenceInMinutes(providedTimeMs) {
-//     const currentTimeMs = new Date().getTime();
-//     const differenceMs = currentTimeMs - providedTimeMs;
-//     const differenceMinutes = Math.floor(differenceMs / (1000 * 60)); // Convert milliseconds to minutes
-//     return `${differenceMinutes} minutes`;
-// }
-// }
+const minutesRemaining = (proposalDuration) => {
+  const endProposalTime = Number(proposalDuration + '000')
+  const currentTimeMs = new Date().getTime();
+  const differenceMs = currentTimeMs - endProposalTime;
+  const minutesRemaining = Math.floor(differenceMs / (1000 * 60));
+  return minutesRemaining;
+}
 
-// const minutesRemaining = (minutes) => {
-//   const currentTime = moment(); // Current time
-//   const futureTime = moment().add(minutes, 'minutes'); // Future time based on minutes
-//
-//   const remainingMinutes = futureTime.diff(currentTime, 'minutes'); // Calculate difference in minutes
-//
-//   return remainingMinutes === 1 ? '1 minute' : remainingMinutes + ' minutes'; // Return formatted string
-// }
-//
-// const hoursRemaining = (hours) => {
-//   const currentTime = moment(); // Current time
-//   const futureTime = moment().add(hours, 'hours'); // Future time based on hours
-//
-//   const remainingHours = futureTime.diff(currentTime, 'hours'); // Calculate difference in hours
-//
-//   return remainingHours === 1 ? '1 hour' : remainingHours + ' hours'; // Return formatted string
-// }
+const secondsRemaining = (proposalDuration) => {
+  const endProposalTime = Number(proposalDuration + '000')
+  const currentTimeMs = new Date().getTime();
+  const differenceMs = endProposalTime - currentTimeMs;
+  const secondsRem = Math.floor(differenceMs / (1000));
+  return secondsRem;
+}
+
+const hoursRemaining = (proposalDuration) => {
+  const endProposalTime = Number(proposalDuration + '000')
+  const currentTimeMs = new Date().getTime();
+  const differenceMs = endProposalTime - currentTimeMs;
+  const hoursRem = Math.floor(differenceMs / (1000 * 60 * 60));
+  return hoursRem;
+}
+
+const timeRemaining = (proposalDuration) => {
+  const minutesRem = minutesRemaining(proposalDuration);
+
+  if (new Date().getTime() > Number(proposalDuration + '000')) {
+    return 'Expired';
+  } else if (minutesRem <= 5) {
+    return `${secondsRemaining(proposalDuration)} seconds.`
+  } else if (minutesRem > 5 && minutesRem < 60) {
+    return `${minutesRem} minutes.`
+  } else if (minutesRem >= 60) {
+    const hoursRem = hoursRemaining(proposalDuration)
+
+    if (hoursRem < 24) {
+      return `${hoursRem} hours.`;
+    } else {
+      const daysRem = daysRemaining(proposalDuration)
+
+      return daysRem == 1 ? '1 day' : daysRem + ' days'
+    }
+  }
+  if (minutesRem > 5 && minutesRem < 60) {
+    return `${minutesRem} minutes.`
+  } else if (minutesRem >= 60) {
+    const hoursRem = hoursRemaining(proposalDuration)
+
+    if (hoursRem < 24) {
+      return `${hoursRem} hours.`
+    }
+  }
+  else {
+    return `${secondsRemaining(proposalDuration)} seconds.`
+  }
+}
 
 export {
   truncate,
@@ -67,7 +98,6 @@ export {
   useGlobalState,
   getGlobalState,
   daysRemaining,
-  // minutesRemaining,
-  // hoursRemaining,
+  timeRemaining
 }
 
