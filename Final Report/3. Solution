@@ -1,6 +1,6 @@
 Solutions 
 
-## Key Features 
+Key Features 
 
 Proposal
 The consensus system allows users to submit a proposal to be voted on. Alongside the proposal, the voting options can also be submitted so that votes are cast towards a specific option. The proposal also has an expiry time so that voting opens and closes appropriately. This also prompts users to cast their votes within the timeframe to reach a decision. The submitter can also put a description of the proposal and provide any additional information needed. This mimics typical voting in real life such as for the election day of governmental elections. The proposal system can be beneficial to allow clear decisions to be made in an efficient manner representative of the members' opinion without the need to hours of boardroom discussions.  
