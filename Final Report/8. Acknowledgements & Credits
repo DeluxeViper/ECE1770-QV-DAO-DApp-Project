@@ -1,1 +1,6 @@
+Acknowledgements
+This system is built upon the DAO voting system created by Darlington “Daltonic” Gospel in “dappVote” repository and associate tutorial. The developers of this system would like to thank Daltonic for allowing us to leverage the voting system to create proposals and vote. 
+
+Development
+The developed sytem used the components for DAO voting from “dappVote” and constructed a more robust user interface with different themes. The developed system also integrated more robust voting mechanisms such as anonymous voting and whitelisting to create more robust voting measures and work towards the goal of increased transparency and voter engagement. 
 
