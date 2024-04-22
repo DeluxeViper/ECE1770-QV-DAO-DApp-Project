@@ -47,7 +47,7 @@ const Proposal = () => {
   return (
     <>
       <ProposalDetails proposal={proposal} data={data} voters={voters} />
-      <CandidatesList proposal={proposal} />
+      <CandidatesList proposal={proposal} voters={voters} />
       <Voters voters={voters} />
     </>
   )

@@ -12,8 +12,12 @@ import {
 } from 'recharts'
 import { timeRemaining, daysRemaining, minutesRemaining, hoursRemaining } from '../store'
 // import { getTokensLeftForProposal } from "../Blockchain.services";
+import { useGlobalState } from "../store/index.js";
+import { calculateRemainingTokens } from "../utils.js"
 
 const ProposalDetails = ({ proposal, data, voters }) => {
+  // const [user] = useGlobalState("user")
+  const [connectedAccount] = useGlobalState("connectedAccount")
 
   const getColorForNumber = (number) => {
     const colorMap = {
@@ -40,9 +44,11 @@ const ProposalDetails = ({ proposal, data, voters }) => {
           ? <>
             and this proposal has ended.
           </> : <> and will expire in <strong>{timeRemaining(proposal?.duration)}</strong></>}</p>
-      <p>
-        You currently have <strong>{}</strong> tokens left for this proposal.
-      </p>
+      {new Date().getTime() < Number(proposal?.duration + '000') &&
+        <p>
+          You currently have <strong>{calculateRemainingTokens(connectedAccount, proposal?.maxTokensPerAddress, voters)}</strong> tokens left for this proposal.
+        </p>
+      }
       {
         proposal?.qvEnabled && <p>This proposal has <strong>Quadratic Voting enabled</strong></p>
       }

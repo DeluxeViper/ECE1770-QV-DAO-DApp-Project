@@ -2,8 +2,11 @@ import { useState, useEffect } from 'react';
 import Identicon from 'react-identicons'
 import { toast } from 'react-toastify'
 import { voteOnProposal } from '../Blockchain.services'
+import { calculateRemainingTokens } from "../utils.js"
+import { useGlobalState } from "../store/index.js";
 
-const CandidatesList = ({ proposal }) => {
+const CandidatesList = ({ proposal, voters }) => {
+  const [connectedAccount] = useGlobalState("connectedAccount")
   const [candidates, setCandidates] = useState([])
   const [votes, setVotes] = useState({})
 
@@ -54,6 +57,15 @@ const CandidatesList = ({ proposal }) => {
     }
 
     return newVoteVal;
+  }
+
+  const isVoteBtnDisabled = (i) => {
+    const remTokens = calculateRemainingTokens(connectedAccount, proposal?.maxTokensPerAddress, voters)
+    const numTokensToSpend = calculateNumTokensSpent(i in votes ? votes[i] : 0)
+    console.log("remTokens: " + remTokens)
+    console.log("numTokens to sepdn: " + numTokensToSpend + ", ")
+    console.log(votes)
+    return numTokensToSpend > remTokens
   }
 
   return (
@@ -137,8 +149,9 @@ const CandidatesList = ({ proposal }) => {
                           text-blue-600 font-medium text-xs leading-tight
                           uppercase hover:border-blue-700 focus:border-blue-700
                           focus:outline-none focus:ring-0 active:border-blue-800
-                          transition duration-150 ease-in-out"
+                          transition duration-150 ease-in-out disabled:border-red-800 disabled:text-red-600"
                           onClick={() => onSubmitVote(i)}
+                          disabled={isVoteBtnDisabled(i)}
                         >
                           Vote
                         </button>
