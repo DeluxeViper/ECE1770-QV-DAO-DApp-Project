@@ -5,6 +5,8 @@ The report is mentioned in the Folder Titled "Final Report"
 
 The app is deployed on: https://quadradao-app.azurewebsites.net
 
+Video demo: https://www.youtube.com/watch?v=eBAnCpWG9JA&ab_channel=AbTechVentures
+
 ## Dependencies
 Install these prerequisites to follow along with the tutorial. See free video tutorial or a full explanation of each prerequisite.
 - NPM: https://nodejs.org
