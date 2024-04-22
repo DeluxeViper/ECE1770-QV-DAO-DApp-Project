@@ -22,7 +22,8 @@ General users also knows as voters of the system are able to login to the system
 Admin Accounts
 Admin users can do all the functions as general users and have additional capabilities. Admis users can submit proposals for all users to vote on. Admins are able to grant NFTs to general users. Admin accounts can change the status of any general user account to an admin account.  
 
-Analytics Dashboard 
+Analytics 
+The analytics of numbers of votes can be seen in each proposal. This is evident in the demo video in section 2. 
 
 Benchmarking  
 Due to the nature of the system deployed the following values are improved on compared to traditional voting mechanisms. When compared to traditioanl voting system, sne area of improvement is Availability. Using Blockchain voting allows technology and voting from anywhere access to a device and stable internet connection.  Another area of improvement is Voting Goals. Voting goals and targets can be monitored easily by members of the DAO governance. The easy to use system can increase voter turnout to meet voting goals. The system increases Transparency. The system allows the voting process to be transparent by clearly displaying all open and closed proposals and the number of votes per option at any given point in time. The system aEquipment: Use of this blockchain voting system allows higher user voting with limited resources and personnel needed. The system increases Responsibility as votes must be cast in an informed yet timely manner. This system instills voter trust.  The improved voting mechanism and limited chance for internal corruption improves voter trust in the governance. Finally, the system increases integrity by verification of users and removing the chance of attacks   
