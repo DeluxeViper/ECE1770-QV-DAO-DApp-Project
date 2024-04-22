@@ -64,8 +64,9 @@ const CandidatesList = ({ proposal, voters }) => {
     const numTokensToSpend = calculateNumTokensSpent(i in votes ? votes[i] : 0)
     console.log("remTokens: " + remTokens)
     console.log("numTokens to sepdn: " + numTokensToSpend + ", ")
-    console.log(votes)
-    return numTokensToSpend > remTokens
+    // console.log(votes)
+    // return numTokensToSpend > remTokens
+    return false 
   }
 
   return (
