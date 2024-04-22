@@ -1,1 +1,20 @@
 Arcitecture
+The architecture diagram is under the section 6 titled arcitecture. 
+
+Local setup instructions 
+The required libraries are truffle, ganache and openzepplin. The installation commands and links are included below. MetaMask wallet web extension is also required.
+Library Installation Commands
+install Truffle and Ganache globally npm install -g truffle ganache-cli
+install openzeppelin: npm install @openzeppelin/contracts
+MetaMask Wallet Instructions (Cannot be done from CLI)
+https://support.metamask.io/hc/en-us/articles/360015489531-Getting-started-with-MetaMask
+Tailwind CSS: https://tailwindcss.com/ To deploy the Dapp on Azure Portal, you need a workable Azure(https://portal.azure.com/) account.
+
+Testing
+Any level of user testing can be completed on the prod version of the system using the following link: https://quadradao-app.azurewebsites.net
+
+New Smart Contact
+In order to deploy a new smart contract run the following truffle command. This command uses truffle to convert the solidity based smart contract into a JSON like format called “abis”. 
+
+Truffle migrate -- reset
+
