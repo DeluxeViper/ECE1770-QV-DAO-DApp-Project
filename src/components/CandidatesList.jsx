@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Identicon from 'react-identicons'
 import { toast } from 'react-toastify'
-import { getProposal, voteOnProposal } from '../Blockchain.services'
+import { voteOnProposal } from '../Blockchain.services'
 
 const CandidatesList = ({ proposal }) => {
   const [candidates, setCandidates] = useState([])
@@ -16,7 +16,7 @@ const CandidatesList = ({ proposal }) => {
       const candidateVotes = {}
       setCandidates(proposal.candidates)
       proposal.candidates.forEach((candidate) => {
-        candidateVotes[candidate.id] = 0 
+        candidateVotes[candidate.id] = 0
       })
       setVotes(candidateVotes)
       console.log("candidateVotes");
@@ -26,13 +26,34 @@ const CandidatesList = ({ proposal }) => {
 
   const onSubmitVote = async (candidateId) => {
     if (new Date().getTime() > Number(proposal.duration + '000')) {
-      const timePassedEndOfDuration = (new Date().getTime() - Number(proposal.duration + '000'))/1000;
+      const timePassedEndOfDuration = (new Date().getTime() - Number(proposal.duration + '000')) / 1000;
       toast.warning('Proposal expired ' + timePassedEndOfDuration + ' seconds ago.')
       return
     }
 
     await voteOnProposal(proposal.id, candidateId, votes[candidateId])
     toast.success('Voted successfully!')
+  }
+
+  const calculateNumTokensSpent = (votes) => {
+    let newVoteVal = votes;
+    if (proposal.qvEnabled) {
+      newVoteVal = Math.pow(votes, 2);
+    }
+
+    if (proposal.linearTimeDecayEnabled) {
+      const endProposalTime = Number(proposal?.duration + '000')
+      if (endProposalTime < new Date().getTime()) {
+        newVoteVal = 0
+      }
+
+      const remainingDuration = endProposalTime - new Date().getTime();
+      const numTokens = Math.round(newVoteVal * Number(proposal?.timeLength + '000') / remainingDuration);
+
+      return numTokens;
+    }
+
+    return newVoteVal;
   }
 
   return (
@@ -61,6 +82,12 @@ const CandidatesList = ({ proposal }) => {
                   >
                     Vote
                   </th>
+                  <th
+                    scope="col"
+                    className="text-sm font-medium px-6 py-4 text-left"
+                  >
+                    Projected number of tokens spent
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -86,36 +113,42 @@ const CandidatesList = ({ proposal }) => {
                     </td>
                     <td className="text-sm font-light px-6 py-4 whitespace-nowrap">
                       <div className="flex">
-                      <input
-                        type="number"
-                        className="form-control block px-3 py-1.5 mr-5
+                        <input
+                          type="number"
+                          className="form-control block px-3 py-1.5 mr-5
           text-base font-normaltext-gray-700
           bg-clip-padding border border-solid border-gray-300
           rounded transition ease-in-out m-0 shadow-md
           focus:text-gray-500 focus:outline-none
           dark:border-gray-500 dark:bg-transparent"
-                        placeholder="e.g 2.5 Eth"
-                        value={votes && i in votes ? votes[i] : 0}
-                        onChange={(e) => {
-                          const newVotes = {
-                            ...votes,
-                          }
-                          newVotes[i] = e.target.value;
-                          setVotes(newVotes)
-                        }}
-                        required
-                      />
-                      <button
-                        className="border-2 rounded-full px-6 py-2.5 border-blue-600
+                          placeholder="e.g 2.5 Eth"
+                          value={votes && i in votes ? votes[i] : 0}
+                          onChange={(e) => {
+                            const newVotes = {
+                              ...votes,
+                            }
+                            newVotes[i] = e.target.value;
+                            setVotes(newVotes)
+                          }}
+                          required
+                        />
+                        <button
+                          className="border-2 rounded-full px-6 py-2.5 border-blue-600
                           text-blue-600 font-medium text-xs leading-tight
                           uppercase hover:border-blue-700 focus:border-blue-700
                           focus:outline-none focus:ring-0 active:border-blue-800
                           transition duration-150 ease-in-out"
-                        onClick={() => onSubmitVote(i)}
-                      >
-                        Vote
-                      </button>
+                          onClick={() => onSubmitVote(i)}
+                        >
+                          Vote
+                        </button>
                       </div>
+                    </td>
+                    <td
+                      scope="col"
+                      className="text-sm font-medium px-6 py-4 text-left"
+                    >
+                      {calculateNumTokensSpent(votes && i in votes ? votes[i] : 0)}
                     </td>
                   </tr>
                 ))}

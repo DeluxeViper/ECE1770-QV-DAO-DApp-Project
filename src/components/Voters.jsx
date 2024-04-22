@@ -52,6 +52,12 @@ const Voters = () => {
                   >
                     Number of votes
                   </th>
+                  <th
+                    scope="col"
+                    className="text-sm font-medium px-6 py-4 text-left"
+                  >
+                    Number of tokens spent 
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -75,6 +81,9 @@ const Voters = () => {
                     </td>
                     <td className="text-sm font-light px-6 py-4 whitespace-nowrap">
                       {voter.numVotes}
+                    </td>
+                    <td className="text-sm font-light px-6 py-4 whitespace-nowrap">
+                      {voter.numTokens} 
                     </td>
                   </tr>
                 ))}

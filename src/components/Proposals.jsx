@@ -26,7 +26,7 @@ const Proposals = () => {
 
   useEffect(() => {
     getAll() 
-  }, [])
+  }, [data])
 
   const getAll = () => setProposals(data)
   const getOpened = () =>

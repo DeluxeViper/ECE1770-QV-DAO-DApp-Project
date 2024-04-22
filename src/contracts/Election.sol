@@ -44,6 +44,7 @@ contract Election is ReentrancyGuard, AccessControl {
         uint256 candidateId;
         uint256 timestamp;
         uint256 numVotes;
+        uint256 numTokens;
     }
 
     //voter status for anonymous voting
@@ -262,10 +263,15 @@ contract Election is ReentrancyGuard, AccessControl {
         return tokensSpent[msg.sender][proposalId];
     }
 
+
+    // Votes {numVotes} number of times for candidate
+    // This method calculates how many tokens it actually costs
+    // to vote for a candidate {numVotes} times, depending on whether
+    // quadratic voting or linear time decay is enabled
     function voteForCandidate(
         uint256 proposalId,
         uint256 candidateId,
-        uint256 numTokens 
+        uint256 numVotes 
     ) public returns (Candidate memory) {
         require(
             hasRole(ADMIN_ROLE, msg.sender) || isStakeholder(msg.sender), "Only Admins and Stakeholders can vote"
@@ -278,36 +284,32 @@ contract Election is ReentrancyGuard, AccessControl {
             revert("Proposal duration expired");
         }
 
-        // Check if msg.sender has enough tokens
-        // TODO: Implement quadratic voiting here
-        uint256 totalNumTokensSpent = tokensSpent[msg.sender][proposalId] +
-            numTokens;
+        // Calculate num tokens
+        // Quadratic voting: cost to the voter = (number of votes)^2
+        uint256 numTokens = numVotes;
+        if (raisedProposals[proposalId].qvEnabled) {
+          numTokens = numVotes ** 2;
+        }
+        if (raisedProposals[proposalId].linearTimeDecayEnabled) {
+          numTokens = linearTimeDecay(numTokens, proposalId);
+        }
+
         require(
-            totalNumTokensSpent <= proposal.maxTokensPerAddress,
-            "Insufficient tokens for address."
+          (tokensSpent[msg.sender][proposalId] + numTokens) <= proposal.maxTokensPerAddress,
+          "Insufficient tokens for address."
         );
 
-        // Add vote to candidate
-        tokensSpent[msg.sender][proposalId] = totalNumTokensSpent;
+        tokensSpent[msg.sender][proposalId] += numTokens;
 
-        // Quadratic voting: cost to the voter = (number of votes)^2
-        uint256 voteWeight = numTokens;
-        if (raisedProposals[proposalId].qvEnabled) {
-          voteWeight = sqrt(numTokens);
-        }
-        uint256 decayWeight = voteWeight;
-        if (raisedProposals[proposalId].linearTimeDecayEnabled) {
-          decayWeight = linearTimeDecay(decayWeight, proposalId);
-        }
-        proposal.candidates[candidateId].votes += decayWeight;
-        proposal.totalVotes += decayWeight;
-
-        // proposal.candidates = candidates; // Updated candidates
+        proposal.candidates[candidateId].votes += numVotes;
+        proposal.totalVotes += numVotes;
 
         // Add vote to Address -> Vote map
         // votes[msg.sender] = Vote(msg.sender, proposalId, candidateId, block.timestamp);
+        // Add vote to candidate
+
         votedOn[proposalId].push(
-            Vote(msg.sender, candidateId, block.timestamp, decayWeight)
+            Vote(msg.sender, candidateId, block.timestamp, numVotes, numTokens)
         );
 
         emit Action(msg.sender, "PROPOSAL_VOTE");
@@ -316,16 +318,18 @@ contract Election is ReentrancyGuard, AccessControl {
         return candidates[candidateId];
     }
 
-    function linearTimeDecay(uint256 voteWeight, uint256 proposalId) internal view returns (uint256) {
+    function linearTimeDecay(uint256 numTokens, uint256 proposalId) internal view returns (uint256) {
       uint256 endTime = raisedProposals[proposalId].duration;
+      uint256 timeLength = raisedProposals[proposalId].timeLength;
       if (block.timestamp >= endTime) {
         return 0; // No voting power left
       }
       uint256 remainingDuration = endTime - block.timestamp;
       // remainingDuration = 100 seconds, voteWeight = 3, endTime = 173432421;
-      uint256 decayedVote = (remainingDuration * voteWeight) / raisedProposals[proposalId].timeLength; 
+      // uint256 decayedVote = (remainingDuration * voteWeight) / raisedProposals[proposalId].timeLength; 
+      uint256 numTokensNeeded = (numTokens * timeLength) / remainingDuration;
 
-      return decayedVote;
+      return numTokensNeeded;
     }
 
     function sqrt(uint256 x) internal pure returns (uint256 y) {

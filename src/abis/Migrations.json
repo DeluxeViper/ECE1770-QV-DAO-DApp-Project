@@ -1926,12 +1926,12 @@
     "1713733918973": {
       "events": {},
       "links": {},
-      "address": "0x027bE9356FAA2E29B46c3A9AA55234494d8f451e",
-      "transactionHash": "0x6f24b34bc1388da898954388df9b2892a80b3638c87dc71572cf5178dbb33ea2"
+      "address": "0x6F241b78846d9aFEf7601aa2a075811ADB4D1c20",
+      "transactionHash": "0x6f9fc70e4c74011b0d284642aeec55337ec664c39965db061f294f7f308f620d"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2024-04-21T21:14:11.484Z",
+  "updatedAt": "2024-04-22T01:58:07.535Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

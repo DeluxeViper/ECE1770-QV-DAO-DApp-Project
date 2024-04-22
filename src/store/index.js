@@ -66,12 +66,12 @@ const timeRemaining = (proposalDuration) => {
   } else if (minutesRem <= 5) {
     return `${secondsRemaining(proposalDuration)} seconds.`
   } else if (minutesRem > 5 && minutesRem < 60) {
-    return `${minutesRem} minutes.`
+    return `${minutesRem} minutes`
   } else if (minutesRem >= 60) {
     const hoursRem = hoursRemaining(proposalDuration)
 
     if (hoursRem < 24) {
-      return `${hoursRem} hours.`;
+      return `${hoursRem} hours`;
     } else {
       const daysRem = daysRemaining(proposalDuration)
 
@@ -79,7 +79,7 @@ const timeRemaining = (proposalDuration) => {
     }
   }
   if (minutesRem > 5 && minutesRem < 60) {
-    return `${minutesRem} minutes.`
+    return `${minutesRem} minutes`
   } else if (minutesRem >= 60) {
     const hoursRem = hoursRemaining(proposalDuration)
 

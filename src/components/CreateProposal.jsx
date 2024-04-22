@@ -112,18 +112,17 @@ const CreateProposal = () => {
             />
           </div>
 
-          <div className="flex flex-row justify-between items-center border border-gray-500 dark:border-gray-500 rounded-xl mt-5">
+          <div className="relative justify-between items-center rounded-xl mt-5">
             <input
-              className="block w-full text-sm
-              bg-transparent border-0
-              focus:outline-none focus:ring-0"
+              id="floating_filled"
+              className="block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 appearance-none dark:text-white focus:outline-none focus:border-blue-600 peer"
               type="number"
               name="Time length of proposal"
-              placeholder="Time length of proposal"
               onChange={(e) => setTimeLength(e.target.value)}
               value={timeLength}
               required
             />
+            <label for="floating_filled" class="absolute px-2.5 text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">Time length of proposal (seconds)</label>
           </div>
 
           <div className="flex justify-between">
@@ -134,7 +133,7 @@ const CreateProposal = () => {
             </label>
 
             <label class="inline-flex items-center cursor-pointer mt-5">
-              <span class="ms-3 mr-5 text-sm font-medium text-gray-900 dark:text-gray-300">{!qvEnabled ? "Enable" : "Disable"} Linear Time Decay</span>
+              <span class="ms-3 mr-5 text-sm font-medium text-gray-900 dark:text-gray-300">{!timeDecayEnabled ? "Enable" : "Disable"} Linear Time Decay</span>
               <input type="checkbox" value={timeDecayEnabled} onChange={(e) => setTimeDecayEnabled(e.target.checked)} class="sr-only peer" />
               <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
             </label>
